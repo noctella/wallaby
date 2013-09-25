@@ -7,13 +7,16 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "WallpaperZoomController.h"
 
 @interface WWallpaperController : UIViewController
-<UIImagePickerControllerDelegate>{
+<UIImagePickerControllerDelegate, UIGestureRecognizerDelegate>{
     __weak IBOutlet UIImageView *ImageView;
+    UIImage *finalWallpaper;
 }
 
 - (IBAction) takePicture:(id) sender;
+- (IBAction) didTouch: (UITapGestureRecognizer *)sender;
 
 @end
 

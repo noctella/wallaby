@@ -98,7 +98,7 @@
             mergedImage = [self drawText:label inImage:mergedImage atPoint:CGPointMake(x, y)];
             [labelImages addObject:title];
             
-            NSLog(@"%@", [tesseract recognizedText]);
+           // NSLog(@"%@", [tesseract recognizedText]);
             
         }
     }
@@ -118,13 +118,18 @@
         mergedImage = [self drawText:label inImage:mergedImage atPoint:CGPointMake(x, y)];
         [labelImages addObject:title];
         
-        NSLog(@"%@", [tesseract recognizedText]);
+        //NSLog(@"%@", [tesseract recognizedText]);
 
         
     }
     
+    
+    
     //mergedImage = [self cropImage:mergedImage toRect:CGRectMake(0, 40, mergedImage.size.width, mergedImage.size.height)];
-    [ImageView initWithImage:mergedImage ];
+    finalWallpaper = [[UIImage alloc]init];
+    finalWallpaper = mergedImage;
+    [ImageView initWithImage:finalWallpaper ];
+  
     //[ImageView initWithImage:[labelImages objectAtIndex:22] ];
     //[labelImages objectAtIndex:16]
 }
@@ -163,8 +168,16 @@ mergedImage = [self MergeImage:mergedImage withImage:icon atXLoc: x atYLoc: y];
     
     [ImageView initWithImage: title];
     [ImageView initWithImage: mergedImage];
-    [self dismissViewControllerAnimated:YES completion:nil];
+   
     
+}
+
+- (IBAction) didTouch: (UITapGestureRecognizer*) sender{
+    NSLog(@"did touch!");
+    WallpaperZoomController *zoomController = [[WallpaperZoomController alloc] initWithNibName:@"WallpaperZoomController" bundle:nil];
+    
+    [self presentViewController: zoomController animated:YES completion: nil];
+    [zoomController setWallpaper: finalWallpaper];
 }
 
 - (UIImage *) cropImage: (UIImage *) image toRect: (CGRect)rect
