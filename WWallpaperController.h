@@ -12,11 +12,14 @@
 @interface WWallpaperController : UIViewController
 <UIImagePickerControllerDelegate, UIGestureRecognizerDelegate>{
     __weak IBOutlet UIImageView *ImageView;
+    IBOutlet UIScrollView *scrollView;
     UIImage *finalWallpaper;
 }
 
 - (IBAction) takePicture:(id) sender;
 - (IBAction) didTouch: (UITapGestureRecognizer *)sender;
+//- (void) didTap: (UIImageView*) imageView;
+@property (nonatomic, retain) IBOutlet UIScrollView *scrollView;
 
 @end
 

@@ -8,6 +8,7 @@
 
 #import "WWallpaperController.h"
 #import "tesseract.h"
+#import "objc/runtime.h"
 // return true if the device has a retina display, false otherwise
 #define IS_RETINA_DISPLAY() [[UIScreen mainScreen] respondsToSelector:@selector(scale)] && [[UIScreen mainScreen] scale] == 2.0f
 
@@ -22,6 +23,8 @@
 @end
 
 @implementation WWallpaperController
+@synthesize scrollView;
+
 
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -36,19 +39,18 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    NSLog(@"view did load");
+
    // [self setView:ImageView];
 	// Do any additional setup after loading the view.
-}
-
--(void) viewDidAppear:(BOOL)animated{
     /*NSLog(@"setting view");
-    Tesseract* tesseract = [[Tesseract alloc] initWithDataPath:@"tessdata" language:@"eng"];
-    [tesseract setImage:[UIImage imageNamed:@"test.jpg"]];
-    [tesseract recognize];
-    
-    NSLog(@"%@", [tesseract recognizedText]);*/
+     Tesseract* tesseract = [[Tesseract alloc] initWithDataPath:@"tessdata" language:@"eng"];
+     [tesseract setImage:[UIImage imageNamed:@"test.jpg"]];
+     [tesseract recognize];
+     
+     NSLog(@"%@", [tesseract recognizedText]);*/
     UIImage *screenshotOriginal = [UIImage imageNamed: @"testLarge.png"];
-      
+    
     UIImage *screenshot = [[UIImage alloc] initWithCGImage:screenshotOriginal.CGImage scale:DISPLAY_SCALE orientation:UIImageOrientationUp];
     UIImage * maskOriginal = [UIImage imageNamed: @"maskx.png"];
     UIImage *mask = [[UIImage alloc] initWithCGImage:maskOriginal.CGImage scale:DISPLAY_SCALE orientation:UIImageOrientationUp];
@@ -76,7 +78,7 @@
         mergedImage = [self MergeImage:mergedImage withImage:icon atXLoc: x atYLoc: y];
         
     }
-
+    
     
     
     
@@ -98,7 +100,7 @@
             mergedImage = [self drawText:label inImage:mergedImage atPoint:CGPointMake(x, y)];
             [labelImages addObject:title];
             
-           // NSLog(@"%@", [tesseract recognizedText]);
+            // NSLog(@"%@", [tesseract recognizedText]);
             
         }
     }
@@ -119,19 +121,83 @@
         [labelImages addObject:title];
         
         //NSLog(@"%@", [tesseract recognizedText]);
-
+        
         
     }
     
     
     
     //mergedImage = [self cropImage:mergedImage toRect:CGRectMake(0, 40, mergedImage.size.width, mergedImage.size.height)];
-    finalWallpaper = [[UIImage alloc]init];
-    finalWallpaper = mergedImage;
-    [ImageView initWithImage:finalWallpaper ];
-  
+    //finalWallpaper = [[UIImage alloc]init];
+    finalWallpaper = [[UIImage alloc] initWithCGImage:mergedImage.CGImage scale:3.0f orientation:UIImageOrientationUp];
+    
+    UIImage *image1 = [[UIImage alloc] initWithCGImage:[UIImage imageNamed:@"wallpaper2.PNG"].CGImage scale:DISPLAY_SCALE orientation:UIImageOrientationUp];
+    UIImage *image2 = [[UIImage alloc] initWithCGImage:[UIImage imageNamed:@"wallpaper3.PNG"].CGImage scale:DISPLAY_SCALE orientation:UIImageOrientationUp];
+	UIImage *image3 = [[UIImage alloc] initWithCGImage:[UIImage imageNamed:@"wallpaper4.PNG"].CGImage scale:DISPLAY_SCALE orientation:UIImageOrientationUp];
+    
+	NSArray *images = [[NSArray alloc] initWithObjects:finalWallpaper, image1,image2,image3,nil];
+    
+    int imageWidth = finalWallpaper.size.width;
+    int imageHeight = finalWallpaper.size.height;
+    int padding = 35;
+    
+    // Now create a UIScrollView to hold the UIImageViews
+    scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0,40,325,imageHeight)];
+    
+    
+    
+	scrollView.pagingEnabled = NO;
+    scrollView.showsHorizontalScrollIndicator = NO;
+    scrollView.showsVerticalScrollIndicator = NO;
+    [scrollView setIndicatorStyle:UIScrollViewIndicatorStyleWhite];
+    int numberOfViews = 3;
+	for (int i = 0; i < numberOfViews; i++) {
+		CGFloat xOrigin = i * (imageWidth + padding);
+		UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(xOrigin,0,imageWidth,imageHeight)];
+        
+		[imageView setImage:[images objectAtIndex:i]];
+		[scrollView addSubview:imageView];
+        imageView.userInteractionEnabled = YES;
+        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didTouch:)];
+        tap.numberOfTouchesRequired = 1;
+        tap.numberOfTapsRequired = 1;
+        objc_setAssociatedObject(tap, "image", [images objectAtIndex:i], OBJC_ASSOCIATION_ASSIGN);
+        [imageView addGestureRecognizer:tap];
+	}
+    
+    /*UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didTap)];
+     tap.numberOfTouchesRequired = 1;
+     tap.numberOfTapsRequired = 1;
+     
+     [scrollView addGestureRecognizer:tap];*/
+    
+    // Set the contentSize equal to the size of the UIImageView
+    // scrollView.contentSize = imageView.scrollview.size;
+	scrollView.contentSize = CGSizeMake(numberOfViews * (imageWidth + padding), imageHeight);
+    
+    
+	// Finally, add the UIScrollView to the controller's view
+    [self.view addSubview:scrollView];
+    
+    
+    // [ImageView initWithImage:finalWallpaper ];
+    
     //[ImageView initWithImage:[labelImages objectAtIndex:22] ];
     //[labelImages objectAtIndex:16]
+
+}
+
+-(void) viewDidAppear:(BOOL)animated{
+    NSLog(@"view did appear");
+
+    }
+
+- (IBAction) didTouch: (UITapGestureRecognizer*) sender{
+    UIImage *wallpaper = objc_getAssociatedObject(sender, "image");
+    WallpaperZoomController *zoomController = [[WallpaperZoomController alloc] initWithNibName:@"WallpaperZoomController" bundle:nil];
+    
+    [self presentViewController: zoomController animated:YES completion: nil];
+    [zoomController setWallpaper: wallpaper];
 }
 
 -(void) imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info{
@@ -172,13 +238,6 @@ mergedImage = [self MergeImage:mergedImage withImage:icon atXLoc: x atYLoc: y];
     
 }
 
-- (IBAction) didTouch: (UITapGestureRecognizer*) sender{
-    NSLog(@"did touch!");
-    WallpaperZoomController *zoomController = [[WallpaperZoomController alloc] initWithNibName:@"WallpaperZoomController" bundle:nil];
-    
-    [self presentViewController: zoomController animated:YES completion: nil];
-    [zoomController setWallpaper: finalWallpaper];
-}
 
 - (UIImage *) cropImage: (UIImage *) image toRect: (CGRect)rect
 {
