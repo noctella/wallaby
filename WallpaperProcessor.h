@@ -8,6 +8,17 @@
 
 #import <Foundation/Foundation.h>
 
-@interface WallpaperProcessor : NSObject
+@interface WallpaperProcessor : NSObject{
+    UIImage *homescreen;
+    UIImage *mask;
+    NSMutableArray *icons;
+    NSMutableArray *labels;
+    NSMutableArray *labelImages;
+}
+
+-(id)initWithHomescreen: (UIImage *)screen;
+- (UIImage *)process: (UIImage *)wallpaper;
+
+
 
 @end
