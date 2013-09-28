@@ -53,4 +53,15 @@
             </connections>
         </tapGestureRecognizer>
     </objects>
+    <classes>
+        <class className="WWallpaperController" superclassName="UIViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/WWallpaperController.h"/>
+            <relationships>
+                <relationship kind="action" name="didTouch:" candidateClass="UITapGestureRecognizer"/>
+                <relationship kind="action" name="takePicture:"/>
+                <relationship kind="outlet" name="ImageView" candidateClass="UIImageView"/>
+                <relationship kind="outlet" name="scrollView" candidateClass="UIScrollView"/>
+            </relationships>
+        </class>
+    </classes>
 </document>

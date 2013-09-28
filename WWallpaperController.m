@@ -9,6 +9,8 @@
 #import "WWallpaperController.h"
 #import "objc/runtime.h"
 #import "WallpaperProcessor.h"
+#import "ELCAlbumPickerController.h"
+#import "ELCImagePickerController.h"
 
 // return true if the device has a retina display, false otherwise
 #define IS_RETINA_DISPLAY() [[UIScreen mainScreen] respondsToSelector:@selector(scale)] && [[UIScreen mainScreen] scale] == 2.0f
@@ -18,6 +20,13 @@
 
 // if the device has a retina display return the real scaled pixel size, otherwise the same size will be returned
 #define PIXEL_SIZE(size) IS_RETINA_DISPLAY() ? CGSizeMake(size.width/2.0f, size.height/2.0f) : size
+
+#define DISPLAY_WIDTH 640
+#define DISPLAY_HEIGHT 1136
+#define WALLPAPER_SCALE 3.0
+#define WALLPAPER_WIDTH DISPLAY_WIDTH/WALLPAPER_SCALE
+#define WALLPAPER_HEIGHT DISPLAY_HEIGHT/WALLPAPER_SCALE
+#define WALLPAPER_PADDING 35
 
 @interface WWallpaperController ()
 
@@ -33,6 +42,8 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         NSLog(@"creating view controller");
+        numWallpapers = 0;
+
     }
     return self;
 }
@@ -44,7 +55,7 @@
 
     UIImage *homescreen = [UIImage imageNamed: @"testLarge.png"];
     
-    WallpaperProcessor *wallpaperProcessor = [[WallpaperProcessor alloc]initWithHomescreen:homescreen];
+    wallpaperProcessor = [[WallpaperProcessor alloc]initWithHomescreen:homescreen];
 
     UIImage *image1 = [wallpaperProcessor process: [UIImage imageNamed:@"wallpaper2.PNG"]];
     UIImage *image2 = [wallpaperProcessor process: [UIImage imageNamed:@"wallpaper3.PNG"]];
@@ -52,26 +63,18 @@
     
     
 	NSArray *images = [[NSArray alloc] initWithObjects:image1,image2,image3,nil];
-    
-    finalWallpaper = [[UIImage alloc] initWithCGImage:homescreen.CGImage scale:3.0f orientation:UIImageOrientationUp];
-    
-    int imageWidth = finalWallpaper.size.width;
-    int imageHeight = finalWallpaper.size.height;
-    int padding = 35;
-    
+
     // Now create a UIScrollView to hold the UIImageViews
-    scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0,40,325,imageHeight)];
-    
-    
-    
+    scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0,40,325,WALLPAPER_HEIGHT)];
+
 	scrollView.pagingEnabled = NO;
     scrollView.showsHorizontalScrollIndicator = NO;
     scrollView.showsVerticalScrollIndicator = NO;
     [scrollView setIndicatorStyle:UIScrollViewIndicatorStyleWhite];
     int numberOfViews = 3;
 	for (int i = 0; i < numberOfViews; i++) {
-		CGFloat xOrigin = i * (imageWidth + padding);
-		UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(xOrigin,0,imageWidth,imageHeight)];
+		CGFloat xOrigin = numWallpapers * (WALLPAPER_WIDTH + WALLPAPER_PADDING);
+		UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(xOrigin,0,WALLPAPER_WIDTH, WALLPAPER_HEIGHT)];
         
 		[imageView setImage:[images objectAtIndex:i]];
 		[scrollView addSubview:imageView];
@@ -81,6 +84,7 @@
         tap.numberOfTapsRequired = 1;
         objc_setAssociatedObject(tap, "image", [images objectAtIndex:i], OBJC_ASSOCIATION_ASSIGN);
         [imageView addGestureRecognizer:tap];
+        numWallpapers++;
 	}
     
     /*UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didTap)];
@@ -91,7 +95,7 @@
     
     // Set the contentSize equal to the size of the UIImageView
     // scrollView.contentSize = imageView.scrollview.size;
-	scrollView.contentSize = CGSizeMake(numberOfViews * (imageWidth + padding), imageHeight);
+	scrollView.contentSize = CGSizeMake(numWallpapers * (WALLPAPER_WIDTH + WALLPAPER_PADDING), WALLPAPER_HEIGHT);
     
     
 	// Finally, add the UIScrollView to the controller's view
@@ -118,13 +122,6 @@
     [zoomController setWallpaper: wallpaper];
 }
 
--(void) imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info{
-    UIImage *screenshot = [info objectForKey: UIImagePickerControllerOriginalImage];
-       
-    
-}
-
-
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
@@ -132,10 +129,48 @@
 }
 
 - (IBAction) takePicture: (id) sender{
-    UIImagePickerController *imagePicker = [[UIImagePickerController alloc]init];
-    [imagePicker setSourceType:UIImagePickerControllerSourceTypePhotoLibrary];
+    // Create the an album controller and image picker
+    ELCAlbumPickerController *albumController = [[ELCAlbumPickerController alloc] init];
+    ELCImagePickerController *imagePicker = [[ELCImagePickerController alloc] initWithRootViewController:albumController];
+    [albumController setParent:imagePicker];
     [imagePicker setDelegate:self];
-    [self presentViewController: imagePicker animated:YES completion:nil];
+    
+    // Present modally
+    [self presentViewController:imagePicker
+                       animated:YES
+                     completion:nil];    
+}
+
+- (void)elcImagePickerController:(ELCImagePickerController *)picker didFinishPickingMediaWithInfo:(NSArray *)info
+{
+    [self dismissViewControllerAnimated:YES completion:nil];
+	    
+    NSMutableArray *images = [NSMutableArray arrayWithCapacity:[info count]];
+	
+	for(NSDictionary *dict in info) {
+        UIImage *image = [wallpaperProcessor process: [dict objectForKey:UIImagePickerControllerOriginalImage]];
+        CGFloat xOrigin = numWallpapers * (WALLPAPER_WIDTH + WALLPAPER_PADDING);
+        UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(xOrigin,0,WALLPAPER_WIDTH,WALLPAPER_HEIGHT)];
+        
+        [imageView setImage:image];
+        [scrollView addSubview:imageView];
+        imageView.userInteractionEnabled = YES;
+        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didTouch:)];
+        tap.numberOfTouchesRequired = 1;
+        tap.numberOfTapsRequired = 1;
+        objc_setAssociatedObject(tap, "image", image, OBJC_ASSOCIATION_ASSIGN);
+        [imageView addGestureRecognizer:tap];
+		[scrollView addSubview:imageView];
+        numWallpapers++;
+    }
+    
+    scrollView.contentSize = CGSizeMake(numWallpapers * (WALLPAPER_WIDTH + WALLPAPER_PADDING), WALLPAPER_HEIGHT);
+		
+}
+
+- (void)elcImagePickerControllerDidCancel:(ELCImagePickerController *)picker
+{
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end

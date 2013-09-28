@@ -8,12 +8,15 @@
 
 #import <UIKit/UIKit.h>
 #import "WallpaperZoomController.h"
+#import "WallpaperProcessor.h"
 
 @interface WWallpaperController : UIViewController
 <UIImagePickerControllerDelegate, UIGestureRecognizerDelegate>{
     __weak IBOutlet UIImageView *ImageView;
     IBOutlet UIScrollView *scrollView;
     UIImage *finalWallpaper;
+    int numWallpapers;
+    WallpaperProcessor *wallpaperProcessor;
 }
 
 - (IBAction) takePicture:(id) sender;
