@@ -31,7 +31,10 @@
 #define WALLPAPER_SCALE 3.0
 #define WALLPAPER_WIDTH DISPLAY_WIDTH/WALLPAPER_SCALE
 #define WALLPAPER_HEIGHT DISPLAY_HEIGHT/WALLPAPER_SCALE
-#define WALLPAPER_PADDING 35
+#define WALLPAPER_PADDING 10
+
+#define THUMBNAIL_SIZE 100
+#define THUMBNAIL_PADDING 3
 
 @interface WWallpaperController ()
 
@@ -65,59 +68,63 @@
     wallpaperProcessor = [[WallpaperProcessor alloc]initWithHomescreen:homescreen];
 
     // Now create a UIScrollView to hold the UIImageViews
-    scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0,40,325,WALLPAPER_HEIGHT)];
+    wallpaperScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0,40,325,WALLPAPER_HEIGHT)];
+    thumbnailScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0,40 + WALLPAPER_HEIGHT,325,100)];
 
-	scrollView.pagingEnabled = NO;
+	wallpaperScrollView.pagingEnabled = NO;
     //scrollView.showsHorizontalScrollIndicator = NO;
-    scrollView.showsVerticalScrollIndicator = NO;
-    [scrollView setIndicatorStyle:UIScrollViewIndicatorStyleWhite];
+    wallpaperScrollView.showsVerticalScrollIndicator = NO;
+    [wallpaperScrollView setIndicatorStyle:UIScrollViewIndicatorStyleWhite];
+    
+    thumbnailScrollView.pagingEnabled = NO;
+    //scrollView.showsHorizontalScrollIndicator = NO;
+     thumbnailScrollView.showsVerticalScrollIndicator = NO;
+    [thumbnailScrollView setIndicatorStyle:UIScrollViewIndicatorStyleWhite];
 
 	for (int i = 0; i < [wallpapers count]; i++) {
-		CGFloat xOrigin = i * (WALLPAPER_WIDTH + WALLPAPER_PADDING);
-		UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(xOrigin,0,WALLPAPER_WIDTH, WALLPAPER_HEIGHT)];
-        UIImage *image = [[wallpapers objectAtIndex:i]getWallpaper];
-		[imageView setImage:image];
-		[scrollView addSubview:imageView];
-        imageView.userInteractionEnabled = YES;
-        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didTouch:)];
-        tap.numberOfTouchesRequired = 1;
-        tap.numberOfTapsRequired = 1;
-        objc_setAssociatedObject(tap, "wallpaperImage", [wallpapers objectAtIndex:i], OBJC_ASSOCIATION_ASSIGN);
-        [imageView addGestureRecognizer:tap];
+		CGFloat wallpaperXOrigin = i * (WALLPAPER_WIDTH + WALLPAPER_PADDING);
+		UIImageView *wallpaperImageView = [[UIImageView alloc] initWithFrame:CGRectMake(wallpaperXOrigin,0,WALLPAPER_WIDTH, WALLPAPER_HEIGHT)];
+        UIImage *wallpaper = [[wallpapers objectAtIndex:i]getWallpaper];
+        [wallpaperImageView setImage:wallpaper];
+        [wallpaperScrollView addSubview:wallpaperImageView];
+        wallpaperImageView.userInteractionEnabled = YES;
+        UITapGestureRecognizer *wallpaperTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didTouchWallpaper:)];
+        wallpaperTap.numberOfTouchesRequired = 1;
+        wallpaperTap.numberOfTapsRequired = 1;
+        objc_setAssociatedObject(wallpaperTap, "wallpaperImage", [wallpapers objectAtIndex:i], OBJC_ASSOCIATION_ASSIGN);
+        [wallpaperImageView addGestureRecognizer:wallpaperTap];
+        
+        CGFloat thumbnailXOrigin = i * (THUMBNAIL_SIZE + THUMBNAIL_PADDING);
+		UIImageView *thumbnailImageView = [[UIImageView alloc] initWithFrame:CGRectMake(thumbnailXOrigin,0,THUMBNAIL_SIZE, THUMBNAIL_SIZE)];
+        UIImage *thumbnail = [[wallpapers objectAtIndex:i]getThumbnail];
+        [thumbnailImageView setImage:thumbnail];
+        [thumbnailScrollView addSubview:thumbnailImageView];
+        thumbnailImageView.userInteractionEnabled = YES;
+        UITapGestureRecognizer *thumbnailTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didTouchThumbnail:)];
+        thumbnailTap.numberOfTouchesRequired = 1;
+        thumbnailTap.numberOfTapsRequired = 1;
+        objc_setAssociatedObject(thumbnailTap, "wallpaperImage", [wallpapers objectAtIndex:i], OBJC_ASSOCIATION_ASSIGN);
+        [thumbnailImageView addGestureRecognizer:thumbnailTap];
+
 	}
-    
-    /*UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didTap)];
-     tap.numberOfTouchesRequired = 1;
-     tap.numberOfTapsRequired = 1;
-     
-     [scrollView addGestureRecognizer:tap];*/
-    
-    // Set the contentSize equal to the size of the UIImageView
-    // scrollView.contentSize = imageView.scrollview.size;
-	scrollView.contentSize = CGSizeMake([wallpapers count] * (WALLPAPER_WIDTH + WALLPAPER_PADDING), WALLPAPER_HEIGHT);
-    NSLog(@"width of scroll view is: %f", scrollView.contentSize.width);
-    NSLog(@"%f", (WALLPAPER_WIDTH + WALLPAPER_PADDING));
 
+	wallpaperScrollView.contentSize = CGSizeMake([wallpapers count] * (WALLPAPER_WIDTH + WALLPAPER_PADDING), WALLPAPER_HEIGHT);
+    
+     thumbnailScrollView.contentSize = CGSizeMake([wallpapers count] * (THUMBNAIL_SIZE + THUMBNAIL_PADDING), THUMBNAIL_SIZE);
 
-    
-    
 	// Finally, add the UIScrollView to the controller's view
-    [self.view addSubview:scrollView];
-    
-    
-    // [ImageView initWithImage:finalWallpaper ];
-    
-    //[ImageView initWithImage:[labelImages objectAtIndex:22] ];
-    //[labelImages objectAtIndex:16]
+    [self.view addSubview:wallpaperScrollView];
+    [self.view addSubview:thumbnailScrollView];
 
 }
+
 
 -(void) viewDidAppear:(BOOL)animated{
     NSLog(@"view did appear");
 
     }
 
-- (IBAction) didTouch: (UITapGestureRecognizer*) sender{
+- (IBAction) didTouchWallpaper: (UITapGestureRecognizer*) sender{
     WallpaperImage *wallpaperImage = objc_getAssociatedObject(sender, "wallpaperImage");
     UIImage *wallpaper = [wallpaperImage getWallpaper];
     WallpaperZoomController *zoomController = [[WallpaperZoomController alloc] initWithNibName:@"WallpaperZoomController" bundle:nil];
@@ -125,6 +132,11 @@
     [self presentViewController: zoomController animated:YES completion: nil];
     [zoomController setWallpaper: wallpaper];
 }
+
+-(IBAction)didTouchThumbnail:(UITapGestureRecognizer*) sender{
+    NSLog(@"touched tumbnail");
+}
+
 
 - (void)didReceiveMemoryWarning
 {
@@ -152,26 +164,44 @@
     NSMutableArray *images = [NSMutableArray arrayWithCapacity:[info count]];
 	
 	for(NSDictionary *dict in info) {
-        UIImage *image = [wallpaperProcessor process: [dict objectForKey:UIImagePickerControllerOriginalImage]];
-        CGFloat xOrigin = [wallpapers count] * (WALLPAPER_WIDTH + WALLPAPER_PADDING);
-        UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(xOrigin,0,WALLPAPER_WIDTH,WALLPAPER_HEIGHT)];
+        UIImage *image = [dict objectForKey:UIImagePickerControllerOriginalImage];
+        CGFloat wallpaperXOrigin = [wallpapers count] * (WALLPAPER_WIDTH + WALLPAPER_PADDING);
+        UIImageView *wallpaperImageView = [[UIImageView alloc] initWithFrame:CGRectMake(wallpaperXOrigin,0,WALLPAPER_WIDTH,WALLPAPER_HEIGHT)];
         
-        WallpaperImage *wallpaperImage = [[WallpaperImage alloc] initWithImage: image];
+        UIImage *wallpaper = [wallpaperProcessor process: image ];
+        UIImage *thumbnail = [wallpaperProcessor makeThumbnail: image];
+        WallpaperImage *wallpaperImage = [[WallpaperImage alloc] initWithWallpaper:wallpaper andThumbnail:thumbnail];
+
+        [wallpaperImageView setImage:wallpaper];
+        [wallpaperScrollView addSubview:wallpaperImageView];
+        wallpaperImageView.userInteractionEnabled = YES;
+        UITapGestureRecognizer *wallpaperTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didTouchWallpaper:)];
+        wallpaperTap.numberOfTouchesRequired = 1;
+        wallpaperTap.numberOfTapsRequired = 1;
+        objc_setAssociatedObject(wallpaperTap, "wallpaperImage", wallpaperImage, OBJC_ASSOCIATION_ASSIGN);
+        [wallpaperImageView addGestureRecognizer:wallpaperTap];
+ 
+        CGFloat thumbnailXOrigin = [wallpapers count] * (THUMBNAIL_SIZE + THUMBNAIL_PADDING);
+		UIImageView *thumbnailImageView = [[UIImageView alloc] initWithFrame:CGRectMake(thumbnailXOrigin,0,THUMBNAIL_SIZE, THUMBNAIL_SIZE)];
+        [thumbnailImageView setImage:thumbnail];
+        [thumbnailScrollView addSubview:thumbnailImageView];
+        thumbnailImageView.userInteractionEnabled = YES;
+        UITapGestureRecognizer *thumbnailTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didTouchThumbnail:)];
+        thumbnailTap.numberOfTouchesRequired = 1;
+        thumbnailTap.numberOfTapsRequired = 1;
+        objc_setAssociatedObject(thumbnailTap, "wallpaperImage", wallpaperImage, OBJC_ASSOCIATION_ASSIGN);
+        [thumbnailImageView addGestureRecognizer:thumbnailTap];
+        
         [wallpapers addObject:wallpaperImage];
         [wallpaperImage saveWallpaper];
-        
-        [imageView setImage:image];
-        [scrollView addSubview:imageView];
-        imageView.userInteractionEnabled = YES;
-        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didTouch:)];
-        tap.numberOfTouchesRequired = 1;
-        tap.numberOfTapsRequired = 1;
-        objc_setAssociatedObject(tap, "wallpaperImage", wallpaperImage, OBJC_ASSOCIATION_ASSIGN);
-        [imageView addGestureRecognizer:tap];
-		[scrollView addSubview:imageView];
+        [wallpaperImage saveThumbnail];
+
+
     }
     
-    scrollView.contentSize = CGSizeMake([wallpapers count] * (WALLPAPER_WIDTH + WALLPAPER_PADDING), WALLPAPER_HEIGHT);
+    wallpaperScrollView.contentSize = CGSizeMake([wallpapers count] * (WALLPAPER_WIDTH + WALLPAPER_PADDING), WALLPAPER_HEIGHT);
+    
+    thumbnailScrollView.contentSize = CGSizeMake([wallpapers count] * (THUMBNAIL_SIZE + THUMBNAIL_PADDING), THUMBNAIL_SIZE);
 		
 }
 

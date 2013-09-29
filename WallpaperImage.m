@@ -9,14 +9,16 @@
 #import "WallpaperImage.h"
 #import "WallpaperDatabase.h"
 #define WALLPAPER_IMAGE_FILE @"wallpaper.png"
+#define THUMBNAIL_IMAGE_FILE @"thumbnail.png"
 
 @implementation WallpaperImage
 
 
--(id)initWithImage: (UIImage *) image{
+-(id)initWithWallpaper: (UIImage *)wallpaperImage andThumbnail: (UIImage *)thumbnailImage{
     self = [super init];
     if(self){
-        wallpaper = image;
+        wallpaper = wallpaperImage;
+        thumbnail = thumbnailImage;
     }
     return self;
     
@@ -35,6 +37,12 @@
     if(wallpaper != nil) return wallpaper;
     NSString *wallpaperPath = [docPath stringByAppendingPathComponent:WALLPAPER_IMAGE_FILE];
     return [UIImage imageWithContentsOfFile:wallpaperPath];
+}
+
+-(UIImage *)getThumbnail{
+    if(thumbnail != nil) return thumbnail;
+    NSString *thumbnailPath = [docPath stringByAppendingPathComponent:THUMBNAIL_IMAGE_FILE];
+    return [UIImage imageWithContentsOfFile:thumbnailPath];
 }
 
 - (BOOL)createDataPath {
@@ -65,4 +73,14 @@
     //wallpaper = nil;
     
 }
+
+- (void)saveThumbnail {
+    
+    [self createDataPath];
+    
+    NSString *thumbnailPath = [docPath stringByAppendingPathComponent:THUMBNAIL_IMAGE_FILE];
+    NSData *thumbnailImageData = UIImagePNGRepresentation(thumbnail);
+    [thumbnailImageData writeToFile:thumbnailPath atomically:YES];
+}
+    
 @end

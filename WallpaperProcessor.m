@@ -237,4 +237,9 @@
 	return [UIImage imageWithCGImage:masked];
     
 }
+
+-(UIImage *)makeThumbnail:(UIImage *)image
+{
+    return [self cropImage:image toRect:CGRectMake(0, image.size.width/2, image.size.width, image.size.width)];
+}
 @end

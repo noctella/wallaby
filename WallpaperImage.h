@@ -10,12 +10,15 @@
 
 @interface WallpaperImage : UIImage{
     UIImage *wallpaper;
+    UIImage *thumbnail;
     NSString *docPath;
 }
 
--(id)initWithImage: (UIImage *)image;
+-(id)initWithWallpaper: (UIImage *)wallpaperImage andThumbnail: (UIImage *)thumbnailImage;
 - (id)initWithFolderPath: (NSString *)path;
 - (UIImage *)getWallpaper;
+- (UIImage *)getThumbnail;
 - (void) saveWallpaper;
+- (void) saveThumbnail;
 
 @end

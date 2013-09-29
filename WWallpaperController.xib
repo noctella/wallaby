@@ -16,7 +16,7 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JT7-0x-MS0">
-                    <rect key="frame" x="106" y="485" width="109" height="44"/>
+                    <rect key="frame" x="99" y="499" width="109" height="44"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <gestureRecognizers/>
                     <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
@@ -57,10 +57,14 @@
         <class className="WWallpaperController" superclassName="UIViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/WWallpaperController.h"/>
             <relationships>
-                <relationship kind="action" name="didTouch:" candidateClass="UITapGestureRecognizer"/>
+                <relationship kind="action" name="didTouchThumbnail:" candidateClass="UITapGestureRecognizer"/>
+                <relationship kind="action" name="didTouchWallaper:" candidateClass="UITapGestureRecognizer"/>
+                <relationship kind="action" name="didTouchWallpaper:" candidateClass="UITapGestureRecognizer"/>
                 <relationship kind="action" name="takePicture:"/>
                 <relationship kind="outlet" name="ImageView" candidateClass="UIImageView"/>
                 <relationship kind="outlet" name="scrollView" candidateClass="UIScrollView"/>
+                <relationship kind="outlet" name="thumbnailScrollView" candidateClass="UIScrollView"/>
+                <relationship kind="outlet" name="wallpaperScrollView" candidateClass="UIScrollView"/>
             </relationships>
         </class>
     </classes>

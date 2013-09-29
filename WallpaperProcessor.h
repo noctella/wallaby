@@ -18,6 +18,7 @@
 
 -(id)initWithHomescreen: (UIImage *)screen;
 - (UIImage *)process: (UIImage *)wallpaper;
+-(UIImage *)makeThumbnail: (UIImage *)image;
 
 
 
