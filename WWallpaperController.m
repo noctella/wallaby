@@ -11,6 +11,11 @@
 #import "WallpaperProcessor.h"
 #import "ELCAlbumPickerController.h"
 #import "ELCImagePickerController.h"
+#import "WallpaperDatabase.h"
+#import "WallpaperImage.h"
+
+#define kDataKey        @"Data"
+#define kDataFile       @"data.plist"
 
 // return true if the device has a retina display, false otherwise
 #define IS_RETINA_DISPLAY() [[UIScreen mainScreen] respondsToSelector:@selector(scale)] && [[UIScreen mainScreen] scale] == 2.0f
@@ -41,8 +46,10 @@
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
+        
+        wallpapers = [WallpaperDatabase loadWallpapers];
+        
         NSLog(@"creating view controller");
-        numWallpapers = 0;
 
     }
     return self;
@@ -57,34 +64,26 @@
     
     wallpaperProcessor = [[WallpaperProcessor alloc]initWithHomescreen:homescreen];
 
-    UIImage *image1 = [wallpaperProcessor process: [UIImage imageNamed:@"wallpaper2.PNG"]];
-    UIImage *image2 = [wallpaperProcessor process: [UIImage imageNamed:@"wallpaper3.PNG"]];
-	UIImage *image3 = [wallpaperProcessor process: [UIImage imageNamed:@"wallpaper4.PNG"]];
-    
-    
-	NSArray *images = [[NSArray alloc] initWithObjects:image1,image2,image3,nil];
-
     // Now create a UIScrollView to hold the UIImageViews
     scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0,40,325,WALLPAPER_HEIGHT)];
 
 	scrollView.pagingEnabled = NO;
-    scrollView.showsHorizontalScrollIndicator = NO;
+    //scrollView.showsHorizontalScrollIndicator = NO;
     scrollView.showsVerticalScrollIndicator = NO;
     [scrollView setIndicatorStyle:UIScrollViewIndicatorStyleWhite];
-    int numberOfViews = 3;
-	for (int i = 0; i < numberOfViews; i++) {
-		CGFloat xOrigin = numWallpapers * (WALLPAPER_WIDTH + WALLPAPER_PADDING);
+
+	for (int i = 0; i < [wallpapers count]; i++) {
+		CGFloat xOrigin = i * (WALLPAPER_WIDTH + WALLPAPER_PADDING);
 		UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(xOrigin,0,WALLPAPER_WIDTH, WALLPAPER_HEIGHT)];
-        
-		[imageView setImage:[images objectAtIndex:i]];
+        UIImage *image = [[wallpapers objectAtIndex:i]getWallpaper];
+		[imageView setImage:image];
 		[scrollView addSubview:imageView];
         imageView.userInteractionEnabled = YES;
         UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didTouch:)];
         tap.numberOfTouchesRequired = 1;
         tap.numberOfTapsRequired = 1;
-        objc_setAssociatedObject(tap, "image", [images objectAtIndex:i], OBJC_ASSOCIATION_ASSIGN);
+        objc_setAssociatedObject(tap, "wallpaperImage", [wallpapers objectAtIndex:i], OBJC_ASSOCIATION_ASSIGN);
         [imageView addGestureRecognizer:tap];
-        numWallpapers++;
 	}
     
     /*UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didTap)];
@@ -95,7 +94,11 @@
     
     // Set the contentSize equal to the size of the UIImageView
     // scrollView.contentSize = imageView.scrollview.size;
-	scrollView.contentSize = CGSizeMake(numWallpapers * (WALLPAPER_WIDTH + WALLPAPER_PADDING), WALLPAPER_HEIGHT);
+	scrollView.contentSize = CGSizeMake([wallpapers count] * (WALLPAPER_WIDTH + WALLPAPER_PADDING), WALLPAPER_HEIGHT);
+    NSLog(@"width of scroll view is: %f", scrollView.contentSize.width);
+    NSLog(@"%f", (WALLPAPER_WIDTH + WALLPAPER_PADDING));
+
+
     
     
 	// Finally, add the UIScrollView to the controller's view
@@ -115,7 +118,8 @@
     }
 
 - (IBAction) didTouch: (UITapGestureRecognizer*) sender{
-    UIImage *wallpaper = objc_getAssociatedObject(sender, "image");
+    WallpaperImage *wallpaperImage = objc_getAssociatedObject(sender, "wallpaperImage");
+    UIImage *wallpaper = [wallpaperImage getWallpaper];
     WallpaperZoomController *zoomController = [[WallpaperZoomController alloc] initWithNibName:@"WallpaperZoomController" bundle:nil];
     
     [self presentViewController: zoomController animated:YES completion: nil];
@@ -149,8 +153,12 @@
 	
 	for(NSDictionary *dict in info) {
         UIImage *image = [wallpaperProcessor process: [dict objectForKey:UIImagePickerControllerOriginalImage]];
-        CGFloat xOrigin = numWallpapers * (WALLPAPER_WIDTH + WALLPAPER_PADDING);
+        CGFloat xOrigin = [wallpapers count] * (WALLPAPER_WIDTH + WALLPAPER_PADDING);
         UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(xOrigin,0,WALLPAPER_WIDTH,WALLPAPER_HEIGHT)];
+        
+        WallpaperImage *wallpaperImage = [[WallpaperImage alloc] initWithImage: image];
+        [wallpapers addObject:wallpaperImage];
+        [wallpaperImage saveWallpaper];
         
         [imageView setImage:image];
         [scrollView addSubview:imageView];
@@ -158,13 +166,12 @@
         UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didTouch:)];
         tap.numberOfTouchesRequired = 1;
         tap.numberOfTapsRequired = 1;
-        objc_setAssociatedObject(tap, "image", image, OBJC_ASSOCIATION_ASSIGN);
+        objc_setAssociatedObject(tap, "wallpaperImage", wallpaperImage, OBJC_ASSOCIATION_ASSIGN);
         [imageView addGestureRecognizer:tap];
 		[scrollView addSubview:imageView];
-        numWallpapers++;
     }
     
-    scrollView.contentSize = CGSizeMake(numWallpapers * (WALLPAPER_WIDTH + WALLPAPER_PADDING), WALLPAPER_HEIGHT);
+    scrollView.contentSize = CGSizeMake([wallpapers count] * (WALLPAPER_WIDTH + WALLPAPER_PADDING), WALLPAPER_HEIGHT);
 		
 }
 

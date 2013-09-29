@@ -18,7 +18,9 @@
     self.viewController = [[WWallpaperController alloc] initWithNibName:@"WWallpaperController" bundle:nil];
     self.window.rootViewController = self.viewController;
     [self.window makeKeyAndVisible];
-    return YES;}
+  
+    return YES;
+}
 
 - (void)applicationWillResignActive:(UIApplication *)application
 {

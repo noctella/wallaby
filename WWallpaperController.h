@@ -14,15 +14,17 @@
 <UIImagePickerControllerDelegate, UIGestureRecognizerDelegate>{
     __weak IBOutlet UIImageView *ImageView;
     IBOutlet UIScrollView *scrollView;
-    UIImage *finalWallpaper;
-    int numWallpapers;
     WallpaperProcessor *wallpaperProcessor;
+    NSMutableArray *wallpapers;
+    NSString *_docPath;
 }
 
 - (IBAction) takePicture:(id) sender;
 - (IBAction) didTouch: (UITapGestureRecognizer *)sender;
 //- (void) didTap: (UIImageView*) imageView;
 @property (nonatomic, retain) IBOutlet UIScrollView *scrollView;
+@property (copy) NSString *docPath;
+- (void)saveImages;
 
 @end
 
