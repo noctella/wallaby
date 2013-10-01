@@ -7,9 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "WWallpaperController.h"
 
 @interface WAppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
+
+@property (strong, nonatomic) WWallpaperController *viewController;
 
 @end
