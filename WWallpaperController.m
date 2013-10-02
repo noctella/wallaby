@@ -124,6 +124,7 @@
 
 		CGFloat wallpaperXOrigin = 53.5 + i * (WALLPAPER_WIDTH + WALLPAPER_PADDING);
 		UIImageView *wallpaperImageView = [[UIImageView alloc] initWithFrame:CGRectMake(wallpaperXOrigin,0,WALLPAPER_WIDTH, WALLPAPER_HEIGHT)];
+        //wallpaperImageView
         UIImage *wallpaper = [[wallpapers objectAtIndex:i]getWallpaper];
         [wallpaperImageView setImage:wallpaper];
         [wallpaperScrollView addSubview:wallpaperImageView];

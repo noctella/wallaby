@@ -13,6 +13,8 @@
 
 // if the device has a retina display return the real scaled pixel size, otherwise the same size will be returned
 #define PIXEL_SIZE(size) IS_RETINA_DISPLAY() ? CGSizeMake(size.width/2.0f, size.height/2.0f) : size
+#define SCREEN_HEIGHT 568
+#define SCREEN_WIDTH 320
 
 #import "WallpaperProcessor.h"
 #import "tesseract.h"
@@ -104,7 +106,12 @@
 }
 
 - (UIImage *)process: (UIImage *)wallpaper{
-    UIImage *processedWallpaper = [[UIImage alloc] initWithCGImage:wallpaper.CGImage scale:DISPLAY_SCALE orientation:UIImageOrientationUp];
+    UIImage *processedWallpaperOrig = [[UIImage alloc] initWithCGImage:wallpaper.CGImage scale:DISPLAY_SCALE orientation:UIImageOrientationUp];
+    
+    
+    
+        UIImage *processedWallpaper = [self formatImage:processedWallpaperOrig];
+    
     
     //main icons
     for(int i=0; i<4; i++){
@@ -158,6 +165,39 @@
     CGImageRelease(imageRef);
     
     return img;
+}
+
+-(UIImage *) formatImage: (UIImage *) wallpaper{
+    //Crop image to the max rect it can be
+    float height = wallpaper.size.height;
+    float width = (SCREEN_WIDTH * height)/SCREEN_HEIGHT;
+    
+    NSLog(@"height: %f, width: %f", height, width);
+    
+    
+    
+    if(wallpaper.size.width < width){
+        width = wallpaper.size.width;
+        height = (SCREEN_HEIGHT*width)/SCREEN_HEIGHT;
+        NSLog(@"Width is the limiter. height: %f, width: %f", height, width);
+    }
+    
+    float heightRatio = SCREEN_HEIGHT/height;
+    UIImage *formattedImage = [self cropImage:wallpaper toRect:CGRectMake(0, 0, width*2, height*2)];
+    
+    return [self imageWithImage:formattedImage scaledToSize: CGSizeMake(width  * heightRatio * 2, height * heightRatio * 2)];
+    
+}
+
+- (UIImage*)imageWithImage:(UIImage*)image
+              scaledToSize:(CGSize)newSize;
+{
+    UIGraphicsBeginImageContext( newSize );
+    [image drawInRect:CGRectMake(0,0,newSize.width,newSize.height)];
+    UIImage* newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return newImage;
 }
 
 
