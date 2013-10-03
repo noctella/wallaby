@@ -60,7 +60,7 @@
     
 }
 
-- (void)saveWallpaper {
+- (void)saveData {
         
     [self createDataPath];
     
@@ -69,18 +69,12 @@
     [wallpaperImageData writeToFile:wallpaperPath atomically:YES];
     NSLog(@"%@", wallpaperPath);
 
+    NSString *thumbnailPath = [docPath stringByAppendingPathComponent:THUMBNAIL_IMAGE_FILE];
+    NSData *thumbnailImageData = UIImagePNGRepresentation(thumbnail);
+    [thumbnailImageData writeToFile:thumbnailPath atomically:YES];
     
     //wallpaper = nil;
     
 }
 
-- (void)saveThumbnail {
-    
-    [self createDataPath];
-    
-    NSString *thumbnailPath = [docPath stringByAppendingPathComponent:THUMBNAIL_IMAGE_FILE];
-    NSData *thumbnailImageData = UIImagePNGRepresentation(thumbnail);
-    [thumbnailImageData writeToFile:thumbnailPath atomically:YES];
-}
-    
 @end

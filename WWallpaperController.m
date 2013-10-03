@@ -26,15 +26,16 @@
 // if the device has a retina display return the real scaled pixel size, otherwise the same size will be returned
 #define PIXEL_SIZE(size) IS_RETINA_DISPLAY() ? CGSizeMake(size.width/2.0f, size.height/2.0f) : size
 
-#define DISPLAY_WIDTH 640
-#define DISPLAY_HEIGHT 1136
-#define WALLPAPER_SCALE 3.0
-#define WALLPAPER_WIDTH (DISPLAY_WIDTH/WALLPAPER_SCALE)
-#define WALLPAPER_HEIGHT (DISPLAY_HEIGHT/WALLPAPER_SCALE)
-#define WALLPAPER_PADDING 2
+#define DISPLAY_WIDTH 320
+#define DISPLAY_HEIGHT 568
+#define WALLPAPER_SCALE 0.77
+#define WALLPAPER_WIDTH (DISPLAY_WIDTH*WALLPAPER_SCALE)
+#define WALLPAPER_HEIGHT (DISPLAY_HEIGHT*WALLPAPER_SCALE)
+#define WALLPAPER_PADDING 4
+#define STATUS_HEIGHT 23
+#define RATIO 2.419
 
-#define THUMBNAIL_SIZE 106
-#define THUMBNAIL_PADDING 2
+#define THUMBNAIL_SIZE (WALLPAPER_WIDTH/RATIO)
 
 #define WALLPAPER_THUMBNAIL_RATIO (WALLPAPER_WIDTH/THUMBNAIL_SIZE)
 
@@ -85,18 +86,17 @@
 
 - (void)updateWallpaperContentOffset {
     CGFloat offsetX   = wallpaperScrollView.contentOffset.x;
-   thumbnailScrollView.contentOffset = CGPointMake(offsetX/2, 0.0f);
+   thumbnailScrollView.contentOffset = CGPointMake(offsetX/RATIO, 0.0f);
 }
 
 - (void)updateThumbnailContentOffset {
     CGFloat offsetX   = thumbnailScrollView.contentOffset.x;
-    wallpaperScrollView.contentOffset = CGPointMake(offsetX*2, 0.0f);
+    wallpaperScrollView.contentOffset = CGPointMake(offsetX*RATIO, 0.0f);
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    NSLog(@"view did load");
     NSLog(@"wallpaper width: %f", WALLPAPER_WIDTH);
     
     UIImage *homescreen = [UIImage imageNamed: @"testLarge.png"];
@@ -104,8 +104,8 @@
     wallpaperProcessor = [[WallpaperProcessor alloc]initWithHomescreen:homescreen];
 
     // Now create a UIScrollView to hold the UIImageViews
-    wallpaperScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0,40,325,WALLPAPER_HEIGHT)];
-    thumbnailScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0,45 + WALLPAPER_HEIGHT,325,100)];
+    wallpaperScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0,STATUS_HEIGHT,325,WALLPAPER_HEIGHT)];
+    thumbnailScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0,STATUS_HEIGHT + WALLPAPER_PADDING + WALLPAPER_HEIGHT,325,100)];
 
     wallpaperScrollView.delegate = self;
 	wallpaperScrollView.pagingEnabled = NO;
@@ -120,9 +120,8 @@
     [thumbnailScrollView setIndicatorStyle:UIScrollViewIndicatorStyleWhite];
 
 	for (int i = 0; i < [wallpapers count]; i++) {
-        NSLog(@"d/w %f", ((DISPLAY_WIDTH - WALLPAPER_WIDTH)/4));
-
-		CGFloat wallpaperXOrigin = 53.5 + i * (WALLPAPER_WIDTH + WALLPAPER_PADDING);
+  
+		CGFloat wallpaperXOrigin = ((DISPLAY_WIDTH - WALLPAPER_WIDTH)/2) + i * (WALLPAPER_WIDTH + WALLPAPER_PADDING);
 		UIImageView *wallpaperImageView = [[UIImageView alloc] initWithFrame:CGRectMake(wallpaperXOrigin,0,WALLPAPER_WIDTH, WALLPAPER_HEIGHT)];
         //wallpaperImageView
         UIImage *wallpaper = [[wallpapers objectAtIndex:i]getWallpaper];
@@ -135,7 +134,7 @@
         objc_setAssociatedObject(wallpaperTap, "wallpaperImage", [wallpapers objectAtIndex:i], OBJC_ASSOCIATION_ASSIGN);
         [wallpaperImageView addGestureRecognizer:wallpaperTap];
         
-        CGFloat thumbnailXOrigin = 107 + (i * (THUMBNAIL_SIZE + THUMBNAIL_PADDING));
+        CGFloat thumbnailXOrigin = ((DISPLAY_WIDTH - THUMBNAIL_SIZE)/2) + (i * (THUMBNAIL_SIZE + WALLPAPER_PADDING));
 		UIImageView *thumbnailImageView = [[UIImageView alloc] initWithFrame:CGRectMake(thumbnailXOrigin,0,THUMBNAIL_SIZE, THUMBNAIL_SIZE)];
         UIImage *thumbnail = [[wallpapers objectAtIndex:i]getThumbnail];
         [thumbnailImageView setImage:thumbnail];
@@ -161,9 +160,7 @@
 
 
 -(void) viewDidAppear:(BOOL)animated{
-    NSLog(@"view did appear");
-
-    }
+}
 
 - (IBAction) didTouchWallpaper: (UITapGestureRecognizer*) sender{
     WallpaperImage *wallpaperImage = objc_getAssociatedObject(sender, "wallpaperImage");
@@ -220,7 +217,7 @@
         objc_setAssociatedObject(wallpaperTap, "wallpaperImage", wallpaperImage, OBJC_ASSOCIATION_ASSIGN);
         [wallpaperImageView addGestureRecognizer:wallpaperTap];
  
-        CGFloat thumbnailXOrigin = [wallpapers count] * (THUMBNAIL_SIZE + THUMBNAIL_PADDING);
+        CGFloat thumbnailXOrigin = [wallpapers count] * (THUMBNAIL_SIZE + WALLPAPER_PADDING);
 		UIImageView *thumbnailImageView = [[UIImageView alloc] initWithFrame:CGRectMake(thumbnailXOrigin,0,THUMBNAIL_SIZE, THUMBNAIL_SIZE)];
         [thumbnailImageView setImage:thumbnail];
         [thumbnailScrollView addSubview:thumbnailImageView];
@@ -232,15 +229,15 @@
         [thumbnailImageView addGestureRecognizer:thumbnailTap];
         
         [wallpapers addObject:wallpaperImage];
-        [wallpaperImage saveWallpaper];
-        [wallpaperImage saveThumbnail];
+        [wallpaperImage saveData];
+        [wallpaperImage deleteData];
 
 
     }
     
     wallpaperScrollView.contentSize = CGSizeMake([wallpapers count] * (WALLPAPER_WIDTH + WALLPAPER_PADDING), WALLPAPER_HEIGHT);
     
-    thumbnailScrollView.contentSize = CGSizeMake([wallpapers count] * (THUMBNAIL_SIZE + THUMBNAIL_PADDING), THUMBNAIL_SIZE);
+    thumbnailScrollView.contentSize = CGSizeMake([wallpapers count] * (THUMBNAIL_SIZE + WALLPAPER_PADDING), THUMBNAIL_SIZE);
 		
 }
 

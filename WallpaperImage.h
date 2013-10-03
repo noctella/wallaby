@@ -18,7 +18,7 @@
 - (id)initWithFolderPath: (NSString *)path;
 - (UIImage *)getWallpaper;
 - (UIImage *)getThumbnail;
-- (void) saveWallpaper;
-- (void) saveThumbnail;
+- (void) saveData;
+- (void) deleteData;
 
 @end
