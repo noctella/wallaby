@@ -183,6 +183,7 @@
 }
 
 - (IBAction) takePicture: (id) sender{
+    
     // Create the an album controller and image picker
     ELCAlbumPickerController *albumController = [[ELCAlbumPickerController alloc] init];
     ELCImagePickerController *imagePicker = [[ELCImagePickerController alloc] initWithRootViewController:albumController];
@@ -201,7 +202,7 @@
 	   
 	for(NSDictionary *dict in info) {
         UIImage *image = [dict objectForKey:UIImagePickerControllerOriginalImage];
-        CGFloat wallpaperXOrigin = [wallpapers count] * (WALLPAPER_WIDTH + WALLPAPER_PADDING);
+        CGFloat wallpaperXOrigin = ((DISPLAY_WIDTH - WALLPAPER_WIDTH)/2) + [wallpapers count] * (WALLPAPER_WIDTH + WALLPAPER_PADDING);
         UIImageView *wallpaperImageView = [[UIImageView alloc] initWithFrame:CGRectMake(wallpaperXOrigin,0,WALLPAPER_WIDTH,WALLPAPER_HEIGHT)];
         
         UIImage *wallpaper = [wallpaperProcessor process: image ];
@@ -217,7 +218,7 @@
         objc_setAssociatedObject(wallpaperTap, "wallpaperImage", wallpaperImage, OBJC_ASSOCIATION_ASSIGN);
         [wallpaperImageView addGestureRecognizer:wallpaperTap];
  
-        CGFloat thumbnailXOrigin = [wallpapers count] * (THUMBNAIL_SIZE + WALLPAPER_PADDING);
+        CGFloat thumbnailXOrigin = ((DISPLAY_WIDTH - THUMBNAIL_SIZE)/2) + [wallpapers count] * (THUMBNAIL_SIZE + WALLPAPER_PADDING);
 		UIImageView *thumbnailImageView = [[UIImageView alloc] initWithFrame:CGRectMake(thumbnailXOrigin,0,THUMBNAIL_SIZE, THUMBNAIL_SIZE)];
         [thumbnailImageView setImage:thumbnail];
         [thumbnailScrollView addSubview:thumbnailImageView];
@@ -230,8 +231,6 @@
         
         [wallpapers addObject:wallpaperImage];
         [wallpaperImage saveData];
-        [wallpaperImage deleteData];
-
 
     }
     

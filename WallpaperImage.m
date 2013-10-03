@@ -77,4 +77,12 @@
     
 }
 
+- (void)deleteData{
+    NSError *error;
+    BOOL success = [[NSFileManager defaultManager] removeItemAtPath:docPath error:&error];
+    if (!success) {
+        NSLog(@"Error removing document path: %@", error.localizedDescription);
+    }
+}
+
 @end
