@@ -105,7 +105,7 @@
 
     // Now create a UIScrollView to hold the UIImageViews
     wallpaperScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0,STATUS_HEIGHT,325,WALLPAPER_HEIGHT)];
-    thumbnailScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0,STATUS_HEIGHT + WALLPAPER_PADDING + WALLPAPER_HEIGHT,325,100)];
+    thumbnailScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0,STATUS_HEIGHT + WALLPAPER_PADDING + WALLPAPER_HEIGHT,325,THUMBNAIL_SIZE)];
 
     wallpaperScrollView.delegate = self;
 	wallpaperScrollView.pagingEnabled = NO;
