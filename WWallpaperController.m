@@ -13,6 +13,8 @@
 #import "ELCImagePickerController.h"
 #import "WallpaperDatabase.h"
 #import "WallpaperImage.h"
+#import "InfiniteScrollView.h"
+#import "ChangeHomescreenController.h"
 
 #define kDataKey        @"Data"
 #define kDataFile       @"data.plist"
@@ -99,13 +101,14 @@
     [super viewDidLoad];
     NSLog(@"wallpaper width: %f", WALLPAPER_WIDTH);
     
-    UIImage *homescreen = [UIImage imageNamed: @"testLarge.png"];
+    homescreen = [UIImage imageNamed: @"testLarge.png"];
     
     wallpaperProcessor = [[WallpaperProcessor alloc]initWithHomescreen:homescreen];
 
     // Now create a UIScrollView to hold the UIImageViews
-    wallpaperScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0,STATUS_HEIGHT,325,WALLPAPER_HEIGHT)];
+    wallpaperScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0,STATUS_HEIGHT,DISPLAY_WIDTH,WALLPAPER_HEIGHT)];
     thumbnailScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0,STATUS_HEIGHT + WALLPAPER_PADDING + WALLPAPER_HEIGHT,325,THUMBNAIL_SIZE)];
+    
 
     wallpaperScrollView.delegate = self;
 	wallpaperScrollView.pagingEnabled = NO;
@@ -151,15 +154,48 @@
 	wallpaperScrollView.contentSize = CGSizeMake(107 + [wallpapers count] * (WALLPAPER_WIDTH + WALLPAPER_PADDING), WALLPAPER_HEIGHT);
     
      thumbnailScrollView.contentSize = CGSizeMake(107 + [wallpapers count] * (WALLPAPER_WIDTH + WALLPAPER_PADDING), THUMBNAIL_SIZE);
+    
+    addWallpaperButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
+    [addWallpaperButton addTarget:self action:@selector(didTouchAddWallpaper:) forControlEvents:UIControlEventTouchDown];
+    [addWallpaperButton setTitle:@"+" forState:UIControlStateNormal];
+    addWallpaperButton.frame = CGRectMake(DISPLAY_WIDTH - 50, DISPLAY_HEIGHT - 50, 25, 25);
+    
+    changeHomescreenButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
+    [changeHomescreenButton addTarget:self action:@selector(didTouchChangeHomescreen:) forControlEvents:UIControlEventTouchDown];
+    [changeHomescreenButton setTitle:@"+" forState:UIControlStateNormal];
+    changeHomescreenButton.frame = CGRectMake(DISPLAY_WIDTH - 50, 50, 25, 25);
+    
+    
 
 	// Finally, add the UIScrollView to the controller's view
     [self.view addSubview:wallpaperScrollView];
     [self.view addSubview:thumbnailScrollView];
+    [self.view addSubview:addWallpaperButton];
+    [self.view addSubview:changeHomescreenButton];
 
 }
 
 
 -(void) viewDidAppear:(BOOL)animated{
+}
+
+- (IBAction) didTouchAddWallpaper:(id)sender{
+    // Create the an album controller and image picker
+    ELCAlbumPickerController *albumController = [[ELCAlbumPickerController alloc] init];
+    ELCImagePickerController *imagePicker = [[ELCImagePickerController alloc] initWithRootViewController:albumController];
+    [albumController setParent:imagePicker];
+    [imagePicker setDelegate:self];
+    
+    // Present modally
+    [self presentViewController:imagePicker
+                       animated:YES
+                     completion:nil];
+}
+
+- (IBAction) didTouchChangeHomescreen: (id) sender {
+    ChangeHomescreenController *changeHomescreenController = [[ChangeHomescreenController alloc]initWithNibName:@"ChangeHomescreenController" bundle:nil];
+    [self presentViewController:changeHomescreenController animated:YES completion:nil];
+    [changeHomescreenController setCurrentHomescreen: homescreen];
 }
 
 - (IBAction) didTouchWallpaper: (UITapGestureRecognizer*) sender{
@@ -180,20 +216,6 @@
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
-}
-
-- (IBAction) takePicture: (id) sender{
-    
-    // Create the an album controller and image picker
-    ELCAlbumPickerController *albumController = [[ELCAlbumPickerController alloc] init];
-    ELCImagePickerController *imagePicker = [[ELCImagePickerController alloc] initWithRootViewController:albumController];
-    [albumController setParent:imagePicker];
-    [imagePicker setDelegate:self];
-    
-    // Present modally
-    [self presentViewController:imagePicker
-                       animated:YES
-                     completion:nil];    
 }
 
 - (void)elcImagePickerController:(ELCImagePickerController *)picker didFinishPickingMediaWithInfo:(NSArray *)info
