@@ -8,6 +8,7 @@
 
 #import "WallpaperDatabase.h"
 #import "WallpaperImage.h"
+#define HOMESCREEN_IMAGE_FILE @"homescreen.png"
 
 @implementation WallpaperDatabase
 
@@ -22,6 +23,24 @@
     
     return documentsDirectory;
     
+}
+
+
++ (UIImage *) loadHomescreen {
+    NSString *documentsDirectory = [WallpaperDatabase getPrivateDocsDir];
+    NSLog(@"Loading homescreen from %@", documentsDirectory);
+    NSString *fullFolderPath = [documentsDirectory stringByAppendingPathComponent:HOMESCREEN_IMAGE_FILE];
+    UIImage *homescreen = [UIImage imageWithContentsOfFile:fullFolderPath];
+    NSLog(@"%@", homescreen);
+    return homescreen;
+
+}
+
++ (void) saveHomescreen: (UIImage *) image {
+    NSString *documentsDirectory = [WallpaperDatabase getPrivateDocsDir];
+    NSString *homescreenPath = [documentsDirectory stringByAppendingPathComponent:HOMESCREEN_IMAGE_FILE];
+    NSData *homescreenImageData = UIImagePNGRepresentation(image);
+    [homescreenImageData writeToFile:homescreenPath atomically:YES];
 }
 
 + (NSMutableArray *)loadWallpapers {

@@ -46,14 +46,35 @@
 @end
 
 @implementation WWallpaperController
+static UIImage *homescreen;
+
+
+
++ (UIImage *) homescreen
+{
+    @synchronized(self){
+        if(homescreen == nil){
+            homescreen = [UIImage alloc];
+        }
+        return homescreen;
+    }
+}
+
++ (void) setHomescreen:(UIImage *)image
+{
+    @synchronized(self){
+        homescreen = image;
+        [WallpaperDatabase saveHomescreen: homescreen];
+    }
+    
+}
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        
         wallpapers = [WallpaperDatabase loadWallpapers];
-        
+       
         NSLog(@"creating view controller");
 
     }
@@ -100,8 +121,13 @@
 {
     [super viewDidLoad];
     NSLog(@"wallpaper width: %f", WALLPAPER_WIDTH);
+    homescreen = [WallpaperDatabase loadHomescreen];
     
-    homescreen = [UIImage imageNamed: @"testLarge.png"];
+    if (homescreen == nil){
+        homescreen = [UIImage imageNamed: @"testLarge.png"];
+        [WallpaperDatabase saveHomescreen: homescreen];
+        NSLog(@"homescreen was nil :)");
+    }
     
     wallpaperProcessor = [[WallpaperProcessor alloc]initWithHomescreen:homescreen];
 

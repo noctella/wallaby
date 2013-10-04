@@ -20,8 +20,10 @@
     NSString *_docPath;
     IBOutlet UIButton *addWallpaperButton;
     IBOutlet UIButton *changeHomescreenButton;
-    UIImage *homescreen;
 }
+
++ (UIImage *) homescreen;
++ (void) setHomescreen: (UIImage *)homescreen;
 
 - (IBAction) didTouchWallpaper: (UITapGestureRecognizer*) sender;
 - (IBAction) didTouchThumbnail: (UITapGestureRecognizer *) sender;

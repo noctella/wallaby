@@ -10,6 +10,7 @@
 		6260209A17FE4F2800BC80D7 /* InfiniteScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6260209917FE4F2800BC80D7 /* InfiniteScrollView.m */; };
 		6260209E17FE529D00BC80D7 /* ChangeHomescreenController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6260209C17FE529D00BC80D7 /* ChangeHomescreenController.m */; };
 		6260209F17FE529D00BC80D7 /* ChangeHomescreenController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6260209D17FE529D00BC80D7 /* ChangeHomescreenController.xib */; };
+		626020A117FE608B00BC80D7 /* transparentWallpaper.png in Resources */ = {isa = PBXBuildFile; fileRef = 626020A017FE608B00BC80D7 /* transparentWallpaper.png */; };
 		62AF525A17FA4FEF003A878A /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 62AF525917FA4FEF003A878A /* AssetsLibrary.framework */; };
 		62F2C3E617FA56DA00C15DA7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F2C32217FA56D900C15DA7 /* AppDelegate.m */; };
 		62F2C3E717FA56DA00C15DA7 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 62F2C32317FA56D900C15DA7 /* Default-568h@2x.png */; };
@@ -60,6 +61,7 @@
 		6260209B17FE529D00BC80D7 /* ChangeHomescreenController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChangeHomescreenController.h; sourceTree = "<group>"; };
 		6260209C17FE529D00BC80D7 /* ChangeHomescreenController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChangeHomescreenController.m; sourceTree = "<group>"; };
 		6260209D17FE529D00BC80D7 /* ChangeHomescreenController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ChangeHomescreenController.xib; sourceTree = "<group>"; };
+		626020A017FE608B00BC80D7 /* transparentWallpaper.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = transparentWallpaper.png; sourceTree = "<group>"; };
 		62AF525917FA4FEF003A878A /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
 		62F2C32117FA56D900C15DA7 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		62F2C32217FA56D900C15DA7 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -541,6 +543,7 @@
 				62F2C40D17FA570E00C15DA7 /* WallpaperZoomController.xib */,
 				62F2C40E17FA570E00C15DA7 /* WWallpaperController.h */,
 				62F2C40F17FA570E00C15DA7 /* WWallpaperController.m */,
+				626020A017FE608B00BC80D7 /* transparentWallpaper.png */,
 				6260209B17FE529D00BC80D7 /* ChangeHomescreenController.h */,
 				6260209C17FE529D00BC80D7 /* ChangeHomescreenController.m */,
 				6260209D17FE529D00BC80D7 /* ChangeHomescreenController.xib */,
@@ -647,6 +650,7 @@
 				62F2C3FA17FA56DA00C15DA7 /* LICENSE in Resources */,
 				62F2C40117FA56DA00C15DA7 /* testLarge.png in Resources */,
 				62F2C41517FA570E00C15DA7 /* WallpaperZoomController.xib in Resources */,
+				626020A117FE608B00BC80D7 /* transparentWallpaper.png in Resources */,
 				62F2C41717FA570E00C15DA7 /* WWallpaperController.xib in Resources */,
 				62F2C3F117FA56DA00C15DA7 /* ELCAssetTablePicker.xib in Resources */,
 				62F2C40217FA56DA00C15DA7 /* testLarge@2x.png in Resources */,

@@ -11,6 +11,8 @@
 @interface WallpaperDatabase : NSObject
 
 + (NSMutableArray *)loadWallpapers;
++ (UIImage *) loadHomescreen;
++ (void) saveHomescreen: (UIImage *)image;
 + (NSString *)nextWallpaperPath;
 
 @end
