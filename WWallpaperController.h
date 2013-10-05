@@ -25,6 +25,8 @@
 + (UIImage *) homescreen;
 + (void) setHomescreen: (UIImage *)homescreen;
 
++ (NSMutableArray *) wallpapers;
+
 - (IBAction) didTouchWallpaper: (UITapGestureRecognizer*) sender;
 - (IBAction) didTouchThumbnail: (UITapGestureRecognizer *) sender;
 - (IBAction) didTouchAddWallpaper:(id) sender;

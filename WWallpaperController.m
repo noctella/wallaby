@@ -47,6 +47,7 @@
 
 @implementation WWallpaperController
 static UIImage *homescreen;
+static NSMutableArray *wallpapers;
 
 
 
@@ -65,6 +66,20 @@ static UIImage *homescreen;
     @synchronized(self){
         homescreen = image;
         [WallpaperDatabase saveHomescreen: homescreen];
+        [WallpaperProcessor setTemplate:homescreen];
+        for(WallpaperImage *wallpaperImage in wallpapers){
+            [wallpaperImage setWallpaper: [WallpaperProcessor process: [wallpaperImage getBackground]]];
+        }
+    }
+}
+
++ (NSMutableArray *) wallpapers
+{
+    @synchronized(self){
+        if(wallpapers== nil){
+            wallpapers= [NSMutableArray alloc];
+        }
+        return wallpapers;
     }
     
 }
@@ -128,8 +143,7 @@ static UIImage *homescreen;
         [WallpaperDatabase saveHomescreen: homescreen];
         NSLog(@"homescreen was nil :)");
     }
-    
-    wallpaperProcessor = [[WallpaperProcessor alloc]initWithHomescreen:homescreen];
+    [WallpaperProcessor setTemplate:homescreen];
 
     // Now create a UIScrollView to hold the UIImageViews
     wallpaperScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0,STATUS_HEIGHT,DISPLAY_WIDTH,WALLPAPER_HEIGHT)];
@@ -253,9 +267,9 @@ static UIImage *homescreen;
         CGFloat wallpaperXOrigin = ((DISPLAY_WIDTH - WALLPAPER_WIDTH)/2) + [wallpapers count] * (WALLPAPER_WIDTH + WALLPAPER_PADDING);
         UIImageView *wallpaperImageView = [[UIImageView alloc] initWithFrame:CGRectMake(wallpaperXOrigin,0,WALLPAPER_WIDTH,WALLPAPER_HEIGHT)];
         
-        UIImage *wallpaper = [wallpaperProcessor process: image ];
-        UIImage *thumbnail = [wallpaperProcessor makeThumbnail: image];
-        WallpaperImage *wallpaperImage = [[WallpaperImage alloc] initWithWallpaper:wallpaper andThumbnail:thumbnail];
+        UIImage *wallpaper = [WallpaperProcessor process: image ];
+        UIImage *thumbnail = [WallpaperProcessor makeThumbnail: image];
+        WallpaperImage *wallpaperImage = [[WallpaperImage alloc] initWithWallpaper:wallpaper andBackground:image andThumbnail:thumbnail];
 
         [wallpaperImageView setImage:wallpaper];
         [wallpaperScrollView addSubview:wallpaperImageView];

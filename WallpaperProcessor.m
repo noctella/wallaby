@@ -21,28 +21,47 @@
 
 
 @implementation WallpaperProcessor
+static UIImage *template;
+static UIImage *mask;
 
--(id)initWithHomescreen: (UIImage *)screen{
-    self = [super init];
-    if(self){
-        homescreen = [[UIImage alloc] initWithCGImage:screen.CGImage scale:DISPLAY_SCALE orientation:UIImageOrientationUp];
-        mask = [[UIImage alloc] initWithCGImage:[UIImage imageNamed: @"mask.png"].CGImage scale:DISPLAY_SCALE orientation:UIImageOrientationUp];
-        
-        [self processHomescreen];
+
++ (UIImage *) template
+{
+    @synchronized(self){
+        if(template == nil){
+            template = [UIImage alloc];
+        }
+        return template;
     }
-    return self;
 }
 
--(void) processHomescreen{
++ (UIImage *) mask
+{
+    @synchronized(self){
+        if(mask == nil){
+            mask = [[UIImage alloc] initWithCGImage:[UIImage imageNamed: @"mask.png"].CGImage scale:DISPLAY_SCALE orientation:UIImageOrientationUp];
+        }
+        return mask;
+    }
+}
 
-    icons = [[NSMutableArray alloc]init];
++ (void) setTemplate:(UIImage *)screen{
+    UIImage *homescreen = [[UIImage alloc] initWithCGImage:screen.CGImage scale:DISPLAY_SCALE orientation:UIImageOrientationUp];
+    template = [self processHomescreen: homescreen];
+}
+
++ (UIImage *) processHomescreen: (UIImage *) homescreen{
+
+    NSMutableArray *icons = [[NSMutableArray alloc]init];
+    UIImage *template = [[UIImage alloc] initWithCGImage:[UIImage imageNamed: @"transparentWallpaper.png"].CGImage scale:DISPLAY_SCALE orientation:UIImageOrientationUp];
 
     //main icons
     for(int i=0; i<4; i++){
         for(int j=0; j< 5; j++){
             int x = 32 + (152*i);
             int y = 50 + (176*j);
-            UIImage *icon = [self maskAndCropImage:homescreen withX:x withY:y withMask:mask];
+            UIImage *icon = [self maskAndCropImage:homescreen withX:x withY:y withMask:[self mask]];
+            template = [self MergeImage:template withImage:icon atXLoc: x atYLoc: y];
             [icons addObject: icon];  
         }
     }
@@ -51,14 +70,15 @@
     for(int i=0; i< 4; i++){
         int x = 32 + (152*i);
         int y = 972;
-        UIImage *icon = [self maskAndCropImage:homescreen withX:x withY:y withMask:mask];
+        UIImage *icon = [self maskAndCropImage:homescreen withX:x withY:y withMask:[self mask]];
+        template = [self MergeImage:template withImage:icon atXLoc: x atYLoc: y];
         [icons addObject: icon];  
     }
     
     Tesseract* tesseract = [[Tesseract alloc] initWithDataPath:@"tessdata" language:@"eng"];
     
-    labels = [[NSMutableArray alloc]init];
-    labelImages = [[NSMutableArray alloc]init];
+    NSMutableArray *labels = [[NSMutableArray alloc]init];
+    NSMutableArray *labelImages = [[NSMutableArray alloc]init];
     
     //main labels
     for(int i=0; i<4; i++){
@@ -75,6 +95,7 @@
                       stringByReplacingOccurrencesOfString:@" " withString:@""];
             [labels addObject:label];
             [labelImages addObject:title];
+            template = [self drawText:label inImage:template atPoint:CGPointMake(x, y)];
 
         }
     }
@@ -93,9 +114,11 @@
                   stringByReplacingOccurrencesOfString:@" " withString:@""];
         [labels addObject:label];
         [labelImages addObject:title];
+        template = [self drawText:label inImage:template atPoint:CGPointMake(x, y)];
  
     }
     NSLog(@"done processing");
+    return template;
 
     
     
@@ -105,58 +128,18 @@
     
 }
 
-- (UIImage *)process: (UIImage *)wallpaper{
++ (UIImage *)process: (UIImage *)wallpaper{
     UIImage *processedWallpaperOrig = [[UIImage alloc] initWithCGImage:wallpaper.CGImage scale:DISPLAY_SCALE orientation:UIImageOrientationUp];
-    
-    
-    
-        UIImage *processedWallpaper = [self formatImage:processedWallpaperOrig];
-    
-    
-    //main icons
-    for(int i=0; i<4; i++){
-        for(int j=0; j< 5; j++){
-            int x = 32 + (152*i);
-            int y = 50 + (176*j);
-            UIImage *icon = [icons objectAtIndex:(i*5) + j];
-            processedWallpaper = [self MergeImage:processedWallpaper withImage:icon atXLoc: x atYLoc: y];
-        }
-    }
-    
-    //bottom icons
-    for(int i=0; i< 4; i++){
-        int x = 32 + (152*i);
-        int y = 972;
-        UIImage *icon = [icons objectAtIndex:20 + i];
-        processedWallpaper = [self MergeImage:processedWallpaper withImage:icon atXLoc: x atYLoc: y];
-        
-    }
-    
-    //main labels
-    for(int i=0; i<4; i++){
-        for(int j=0; j< 5; j++){
-            int x = 32 + (152*i);
-            int y = 173 + (176*j);
-            NSString *label = [labels objectAtIndex:(i*5) + j];
-            processedWallpaper = [self drawText:label inImage:processedWallpaper atPoint:CGPointMake(x, y)];
 
-        }
-    }
-    
-    //bottom labels
-    for(int i=0; i< 4; i++){
-        int x = 30 + (150*i);
-        int y = 1094;
-        NSString *label = [labels objectAtIndex:20 + i];
-        processedWallpaper = [self drawText:label inImage:processedWallpaper atPoint:CGPointMake(x, y)];  
-    }
-
+    UIImage *processedWallpaper = [self formatImage:processedWallpaperOrig];
+    processedWallpaper = [self MergeImage:processedWallpaper withImage:template atXLoc:0 atYLoc:0];
     return processedWallpaper;
+    
 }
 
 
 
-- (UIImage *) cropImage: (UIImage *) image toRect: (CGRect)rect
++ (UIImage *) cropImage: (UIImage *) image toRect: (CGRect)rect
 {
     // Create bitmap image from original image data,
     // using rectangle to specify desired crop area
@@ -167,7 +150,7 @@
     return img;
 }
 
--(UIImage *) formatImage: (UIImage *) wallpaper{
++(UIImage *) formatImage: (UIImage *) wallpaper{
     //Crop image to the max rect it can be
     float height = wallpaper.size.height;
     float width = (SCREEN_WIDTH * height)/SCREEN_HEIGHT;
@@ -189,7 +172,7 @@
     
 }
 
-- (UIImage*)imageWithImage:(UIImage*)image
++ (UIImage*)imageWithImage:(UIImage*)image
               scaledToSize:(CGSize)newSize;
 {
     UIGraphicsBeginImageContext( newSize );
@@ -201,7 +184,7 @@
 }
 
 
-- (UIImage*) drawText:(NSString*) text inImage:(UIImage*)  image atPoint:(CGPoint)   point
++ (UIImage*) drawText:(NSString*) text inImage:(UIImage*)  image atPoint:(CGPoint)   point
 {
     //convert image1 from UIImage to CGImageRef to get Width and Height
     CGImageRef img1Ref = image.CGImage;
@@ -223,7 +206,7 @@
     return newImage;
 }
 
--(UIImage*)MergeImage:(UIImage*)img1 withImage:(UIImage*)img2 atXLoc: (int) x atYLoc: (int) y
++(UIImage*)MergeImage:(UIImage*)img1 withImage:(UIImage*)img2 atXLoc: (int) x atYLoc: (int) y
 {
     //return value
     UIImage* result = nil;
@@ -259,7 +242,7 @@
     return returnedImage;
 }
 
-- (UIImage*) maskAndCropImage:(UIImage *)image withX: (float) x withY: (float) y withMask:(UIImage *)maskImage {
++ (UIImage*) maskAndCropImage:(UIImage *)image withX: (float) x withY: (float) y withMask:(UIImage *)maskImage {
     CGRect rect = CGRectMake(x, y , 120, 120);
     
     CGImageRef imageRef = CGImageCreateWithImageInRect([image CGImage], rect);
@@ -280,7 +263,7 @@
     
 }
 
--(UIImage *)makeThumbnail:(UIImage *)image
++(UIImage *)makeThumbnail:(UIImage *)image
 {
     return [self cropImage:image toRect:CGRectMake(0, image.size.width/2, image.size.width, image.size.width)];
 }

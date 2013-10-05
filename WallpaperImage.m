@@ -9,16 +9,23 @@
 #import "WallpaperImage.h"
 #import "WallpaperDatabase.h"
 #define WALLPAPER_IMAGE_FILE @"wallpaper.png"
+#define BACKGROUND_IMAGE_FILE @"background.png"
 #define THUMBNAIL_IMAGE_FILE @"thumbnail.png"
 
 @implementation WallpaperImage
 
 
--(id)initWithWallpaper: (UIImage *)wallpaperImage andThumbnail: (UIImage *)thumbnailImage{
+-(id)initWithWallpaper: (UIImage *)wallpaperImage andBackground: (UIImage *) backgroundImage andThumbnail: (UIImage *)thumbnailImage{
     self = [super init];
     if(self){
         wallpaper = wallpaperImage;
+        background = backgroundImage;
         thumbnail = thumbnailImage;
+        
+        [self createDataPath];
+        [self saveWallpaper];
+        [self saveBackground];
+        [self saveThumbnail];
     }
     return self;
     
@@ -39,11 +46,23 @@
     return [UIImage imageWithContentsOfFile:wallpaperPath];
 }
 
+-(void) setWallpaper: (UIImage *) image{
+    wallpaper = image;
+    [self saveWallpaper];
+}
+
 -(UIImage *)getThumbnail{
     if(thumbnail != nil) return thumbnail;
     NSString *thumbnailPath = [docPath stringByAppendingPathComponent:THUMBNAIL_IMAGE_FILE];
     return [UIImage imageWithContentsOfFile:thumbnailPath];
 }
+
+-(UIImage *)getBackground{
+    if(background != nil) return background;
+    NSString *backgroundPath = [docPath stringByAppendingPathComponent:BACKGROUND_IMAGE_FILE];
+    return [UIImage imageWithContentsOfFile:backgroundPath];
+}
+
 
 - (BOOL)createDataPath {
     
@@ -58,6 +77,26 @@
     }
     return success;
     
+}
+
+-(void)saveWallpaper {
+    NSString *wallpaperPath = [docPath stringByAppendingPathComponent:WALLPAPER_IMAGE_FILE];
+    NSData *wallpaperImageData = UIImagePNGRepresentation(wallpaper);
+    [wallpaperImageData writeToFile:wallpaperPath atomically:YES];
+    NSLog(@"%@", wallpaperPath);
+}
+
+-(void) saveBackground {
+    NSString *backgroundPath = [docPath stringByAppendingPathComponent:BACKGROUND_IMAGE_FILE];
+    NSData *backgroundImageData = UIImagePNGRepresentation(background);
+    [backgroundImageData writeToFile:backgroundPath atomically:YES];
+    NSLog(@"%@", backgroundPath);
+}
+
+-(void) saveThumbnail {
+    NSString *thumbnailPath = [docPath stringByAppendingPathComponent:THUMBNAIL_IMAGE_FILE];
+    NSData *thumbnailImageData = UIImagePNGRepresentation(thumbnail);
+    [thumbnailImageData writeToFile:thumbnailPath atomically:YES];
 }
 
 - (void)saveData {

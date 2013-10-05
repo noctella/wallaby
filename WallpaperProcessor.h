@@ -9,16 +9,13 @@
 #import <Foundation/Foundation.h>
 
 @interface WallpaperProcessor : NSObject{
-    UIImage *homescreen;
-    UIImage *mask;
-    NSMutableArray *icons;
-    NSMutableArray *labels;
-    NSMutableArray *labelImages;
 }
-
--(id)initWithHomescreen: (UIImage *)screen;
-- (UIImage *)process: (UIImage *)wallpaper;
--(UIImage *)makeThumbnail: (UIImage *)image;
++ (UIImage *) template;
++ (UIImage *) mask;
++ (void) setTemplate: (UIImage *) screen;
++ (UIImage *)processHomescreen: (UIImage *)homescreen;
++ (UIImage *)process: (UIImage *)wallpaper;
++(UIImage *)makeThumbnail: (UIImage *)image;
 
 
 
