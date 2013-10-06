@@ -6,13 +6,13 @@
 //  Copyright (c) 2013 Loïs Di Qual. All rights reserved.
 //
 
-#import "WallpaperView.h"
+#import "WallpaperItem.h"
 #import "WallpaperDatabase.h"
 #define WALLPAPER_IMAGE_FILE @"wallpaper.png"
 #define BACKGROUND_IMAGE_FILE @"background.png"
 #define THUMBNAIL_IMAGE_FILE @"thumbnail.png"
 
-@implementation WallpaperView
+@implementation WallpaperItem
 
 
 -(id)initWithWallpaper: (UIImage *)wallpaperImage andBackground: (UIImage *) backgroundImage andThumbnail: (UIImage *)thumbnailImage{
@@ -26,10 +26,13 @@
         [self saveWallpaper];
         [self saveBackground];
         [self saveThumbnail];
-        [self setImage:wallpaper];
         NSLog(@"seet the wallpaper");
-
-        self.userInteractionEnabled = YES;
+        
+        thumbnailView = [[UIImageView alloc]initWithImage:thumbnailImage];
+        thumbnailView.userInteractionEnabled = YES;
+        
+        wallpaperView =[[UIImageView alloc]initWithImage:wallpaperImage];
+        wallpaperView.userInteractionEnabled = YES;
     }
     return self;
     
@@ -40,14 +43,36 @@
     self = [super init];
     if(self){
          docPath = path;
-         self.userInteractionEnabled = YES;
+
+        thumbnail = [self getThumbnail];
+        thumbnailView = [[UIImageView alloc]initWithImage:thumbnail];
+        thumbnailView.userInteractionEnabled = YES;
+        
         wallpaper = [self getWallpaper];
-        [self setImage: wallpaper];
+        wallpaperView = [[UIImageView alloc]initWithImage:wallpaper];
+        wallpaperView.userInteractionEnabled = YES;
         
     }
     
     return self;
 }
+
+-(UIImageView*)getThumbnailView{
+    return thumbnailView;
+}
+
+- (void) setThumbnailViewFrame: (CGRect) frame{
+    thumbnailView.frame = frame;
+}
+
+-(UIImageView*)getWallpaperView{
+    return wallpaperView;
+}
+
+- (void) setWallpaperViewFrame: (CGRect) frame{
+    wallpaperView.frame = frame;
+}
+
 
 -(UIImage *)getWallpaper{
     if(wallpaper != nil) return wallpaper;
@@ -57,7 +82,7 @@
 
 -(void) setWallpaper: (UIImage *) image{
     wallpaper = image;
-    [self setImage:wallpaper];
+    [wallpaperView setImage:wallpaper];
     [self saveWallpaper];
 }
 

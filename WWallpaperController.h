@@ -16,7 +16,6 @@
     IBOutlet UIScrollView *wallpaperScrollView;
     IBOutlet UIScrollView *thumbnailScrollView;
     WallpaperProcessor *wallpaperProcessor;
-    NSMutableArray *wallpapers;
     NSString *_docPath;
     IBOutlet UIButton *addWallpaperButton;
     IBOutlet UIButton *changeHomescreenButton;
@@ -24,11 +23,12 @@
 
 + (UIImage *) homescreen;
 + (void) setHomescreen: (UIImage *)homescreen;
-+ (NSMutableArray *) wallpaperViews;
++ (NSMutableArray *) wallpaperItems;
 
 - (IBAction) didTouchWallpaper: (UITapGestureRecognizer*) sender;
-- (IBAction) didTouchThumbnail: (UITapGestureRecognizer *) sender;
+- (IBAction) didLongPressThumbnail: (UILongPressGestureRecognizer *) sender;
 - (IBAction) didTouchAddWallpaper:(id) sender;
+- (IBAction)didTouchDeleteWallpaper:(id) sender;
 - (IBAction) didTouchChangeHomescreen: (id) sender;
 @property (nonatomic, weak) id<UIScrollViewDelegate> scrollViewDelegate;
 @property (copy) NSString *docPath;

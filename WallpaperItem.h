@@ -8,11 +8,15 @@
 
 #import <UIKit/UIKit.h>
 
-@interface WallpaperView : UIImageView{
+@interface WallpaperItem : UIImageView{
     UIImage *wallpaper;
     UIImage *background;
     UIImage *thumbnail;
     NSString *docPath;
+    UIImageView *thumbnailView;
+    UIImageView *wallpaperView;
+    int index;
+    
 }
 
 -(id)initWithWallpaper: (UIImage *)wallpaperImage andBackground: (UIImage *) background andThumbnail: (UIImage *)thumbnailImage;
@@ -20,9 +24,14 @@
 - (UIImage *)getWallpaper;
 - (UIImage *)getThumbnail;
 - (UIImage *)getBackground;
+- (UIImageView*)getThumbnailView;
+- (UIImageView*)getWallpaperView;
 - (void) setWallpaper: (UIImage *) image;
 - (void) saveData;
 - (void) deleteData;
+- (void) setThumbnailViewFrame: (CGRect) frame;
+- (void) setWallpaperViewFrame: (CGRect) frame;
+
 
 
 @end

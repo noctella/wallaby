@@ -51,6 +51,9 @@ static UIImage *mask;
 }
 
 + (UIImage *) processHomescreen: (UIImage *) homescreen{
+    
+    NSLog(@"processing the homescreen, %@", homescreen);
+
 
     UIImage *template = [[UIImage alloc] initWithCGImage:[UIImage imageNamed: @"transparentWallpaper.png"].CGImage scale:DISPLAY_SCALE orientation:UIImageOrientationUp];
 
@@ -79,7 +82,11 @@ static UIImage *mask;
         for(int j=0; j< 5; j++){
             int x = 32 + (152*i);
             int y = 173 + (176*j);
+            NSLog(@"homescreen before title is: %@", homescreen);
+
             UIImage *title = [self cropImage:homescreen toRect:CGRectMake(x, y, 122, 30)];
+            NSLog(@"title is: %@", title);
+
            
             [tesseract setImage:title];
             [tesseract recognize];
@@ -125,7 +132,9 @@ static UIImage *mask;
     // using rectangle to specify desired crop area
     CGImageRef imageRef = CGImageCreateWithImageInRect([image CGImage], rect);
     UIImage *img = [UIImage imageWithCGImage:imageRef];
-    CGImageRelease(imageRef);
+    NSLog(@"created image is: %@", img);
+
+   // CGImageRelease(imageRef);
     
     return img;
 }
@@ -224,6 +233,8 @@ static UIImage *mask;
 
 + (UIImage*) maskAndCropImage:(UIImage *)image withX: (float) x withY: (float) y withMask:(UIImage *)maskImage {
     CGRect rect = CGRectMake(x, y , 120, 120);
+    NSLog(@"mask is: %@", maskImage);
+
     
     CGImageRef imageRef = CGImageCreateWithImageInRect([image CGImage], rect);
     image = [UIImage imageWithCGImage:imageRef];

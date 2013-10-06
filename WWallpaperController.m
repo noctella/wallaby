@@ -12,7 +12,7 @@
 #import "ELCAlbumPickerController.h"
 #import "ELCImagePickerController.h"
 #import "WallpaperDatabase.h"
-#import "WallpaperView.h"
+#import "WallpaperItem.h"
 #import "InfiniteScrollView.h"
 #import "ChangeHomescreenController.h"
 
@@ -48,7 +48,7 @@
 
 @implementation WWallpaperController
 static UIImage *homescreen;
-static NSMutableArray *wallpaperViews;
+static NSMutableArray *wallpaperItems;
 
 
 
@@ -68,19 +68,19 @@ static NSMutableArray *wallpaperViews;
         homescreen = image;
         [WallpaperDatabase saveHomescreen: homescreen];
         [WallpaperProcessor setTemplate:homescreen];
-        for(WallpaperView *wallpaperView in wallpaperViews){
-            [wallpaperView setWallpaper: [WallpaperProcessor process: [wallpaperView getBackground]]];
+        for(WallpaperItem *wallpaperItem in wallpaperItems){
+            [wallpaperItem setWallpaper: [WallpaperProcessor process: [wallpaperItem getBackground]]];
         }
     }
 }
 
-+ (NSMutableArray *) wallpaperViews
++ (NSMutableArray *) wallpaperItems
 {
     @synchronized(self){
-        if(wallpaperViews== nil){
-            wallpaperViews= [NSMutableArray alloc];
+        if(wallpaperItems== nil){
+            wallpaperItems= [NSMutableArray alloc];
         }
-        return wallpaperViews;
+        return wallpaperItems;
     }
     
 }
@@ -89,7 +89,7 @@ static NSMutableArray *wallpaperViews;
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        wallpaperViews = [WallpaperDatabase loadWallpapers];
+        wallpaperItems = [WallpaperDatabase loadWallpapers];
         NSLog(@"creating view controller");
     }
     return self;
@@ -134,7 +134,6 @@ static NSMutableArray *wallpaperViews;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    NSLog(@"wallpaper width: %f", WALLPAPER_WIDTH);
     homescreen = [WallpaperDatabase loadHomescreen];
     
     if (homescreen == nil){
@@ -161,38 +160,37 @@ static NSMutableArray *wallpaperViews;
      thumbnailScrollView.showsVerticalScrollIndicator = NO;
     [thumbnailScrollView setIndicatorStyle:UIScrollViewIndicatorStyleWhite];
 
-	for (int i = 0; i < [wallpaperViews count]; i++) {
+	for (int i = 0; i < [wallpaperItems count]; i++) {
   
+        WallpaperItem *wallpaperItem = [wallpaperItems objectAtIndex:i];
+        
 		CGFloat wallpaperXOrigin = ((DISPLAY_WIDTH - WALLPAPER_WIDTH)/2) + (i * (WALLPAPER_WIDTH + WALLPAPER_PADDING));
-         WallpaperView *wallpaperView = [wallpaperViews objectAtIndex:i];
-        [wallpaperView setFrame: CGRectMake(wallpaperXOrigin,0,WALLPAPER_WIDTH, WALLPAPER_HEIGHT)];
-        [wallpaperScrollView addSubview:wallpaperView];
+        
+        [wallpaperItem setWallpaperViewFrame: CGRectMake(wallpaperXOrigin,0,WALLPAPER_WIDTH, WALLPAPER_HEIGHT)];
+        [wallpaperScrollView addSubview:[wallpaperItem getWallpaperView]];
       
         UITapGestureRecognizer *wallpaperTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didTouchWallpaper:)];
         wallpaperTap.numberOfTouchesRequired = 1;
         wallpaperTap.numberOfTapsRequired = 1;
-        objc_setAssociatedObject(wallpaperTap, "wallpaperImage", [wallpaperViews objectAtIndex:i], OBJC_ASSOCIATION_ASSIGN);
-        [wallpaperView addGestureRecognizer:wallpaperTap];
+        objc_setAssociatedObject(wallpaperTap, "wallpaperItem", [wallpaperItems objectAtIndex:i], OBJC_ASSOCIATION_ASSIGN);
+        [[wallpaperItem getWallpaperView] addGestureRecognizer:wallpaperTap];
         
         CGFloat thumbnailXOrigin = ((DISPLAY_WIDTH - THUMBNAIL_SIZE)/2) + (i * (THUMBNAIL_SIZE + WALLPAPER_PADDING));
-        NSLog(@"starter:%f", (i * (WALLPAPER_WIDTH + WALLPAPER_PADDING)));
 
-		UIImageView *thumbnailImageView = [[UIImageView alloc] initWithFrame:CGRectMake(thumbnailXOrigin,0,THUMBNAIL_SIZE, THUMBNAIL_SIZE)];
-        UIImage *thumbnail = [[wallpaperViews objectAtIndex:i]getThumbnail];
-        [thumbnailImageView setImage:thumbnail];
-        [thumbnailScrollView addSubview:thumbnailImageView];
-        thumbnailImageView.userInteractionEnabled = YES;
-        UITapGestureRecognizer *thumbnailTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didTouchThumbnail:)];
-        thumbnailTap.numberOfTouchesRequired = 1;
-        thumbnailTap.numberOfTapsRequired = 1;
-        objc_setAssociatedObject(thumbnailTap, "wallpaperImage", [wallpaperViews objectAtIndex:i], OBJC_ASSOCIATION_ASSIGN);
-        [thumbnailImageView addGestureRecognizer:thumbnailTap];
+        [wallpaperItem setThumbnailViewFrame:CGRectMake(thumbnailXOrigin,0,THUMBNAIL_SIZE, THUMBNAIL_SIZE)];
+        [thumbnailScrollView addSubview:[wallpaperItem getThumbnailView]];
+        
+        UILongPressGestureRecognizer *thumbnailLongPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(didLongPressThumbnail:)];
+        thumbnailLongPress.numberOfTouchesRequired = 1;
+        thumbnailLongPress.minimumPressDuration = 1;
+        objc_setAssociatedObject(thumbnailLongPress, "wallpaperItem", [wallpaperItems objectAtIndex:i], OBJC_ASSOCIATION_ASSIGN);
+        [[wallpaperItem getThumbnailView] addGestureRecognizer:thumbnailLongPress];
 
 	}
 
-	wallpaperScrollView.contentSize = CGSizeMake(107 + [wallpaperViews count] * (WALLPAPER_WIDTH + WALLPAPER_PADDING), WALLPAPER_HEIGHT);
+	wallpaperScrollView.contentSize = CGSizeMake(107 + [wallpaperItems count] * (WALLPAPER_WIDTH + WALLPAPER_PADDING), WALLPAPER_HEIGHT);
     
-     thumbnailScrollView.contentSize = CGSizeMake(107 + [wallpaperViews count] * (WALLPAPER_WIDTH + WALLPAPER_PADDING), THUMBNAIL_SIZE);
+     thumbnailScrollView.contentSize = CGSizeMake(107 + [wallpaperItems count] * (WALLPAPER_WIDTH + WALLPAPER_PADDING), THUMBNAIL_SIZE);
     
     addWallpaperButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
     [addWallpaperButton addTarget:self action:@selector(didTouchAddWallpaper:) forControlEvents:UIControlEventTouchDown];
@@ -238,20 +236,50 @@ static NSMutableArray *wallpaperViews;
 }
 
 - (IBAction) didTouchWallpaper: (UITapGestureRecognizer*) sender{
-    WallpaperView *wallpaperView = objc_getAssociatedObject(sender, "wallpaperImage");
-    UIImage *wallpaper = [wallpaperView getWallpaper];
+    WallpaperItem *wallpaperItem = objc_getAssociatedObject(sender, "wallpaperItem");
+    UIImage *wallpaper = [wallpaperItem getWallpaper];
     WallpaperZoomController *zoomController = [[WallpaperZoomController alloc] initWithNibName:@"WallpaperZoomController" bundle:nil];
     
     [self presentViewController: zoomController animated:YES completion: nil];
     [zoomController setWallpaper: wallpaper];
 }
 
--(IBAction)didTouchThumbnail:(UITapGestureRecognizer*) sender{
-    NSLog(@"touched tumbnail");
+-(IBAction)didLongPressThumbnail:(UILongPressGestureRecognizer*) sender{
+    for(WallpaperItem *wallpaperItem in wallpaperItems){
+        UIButton *deleteWallpaperButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
+        [deleteWallpaperButton addTarget:self action:@selector(didTouchDeleteWallpaper:) forControlEvents:UIControlEventTouchDown];
+        [deleteWallpaperButton setTitle:@"+" forState:UIControlStateNormal];
+        deleteWallpaperButton.frame = CGRectMake( 50,50 , 25, 25);
+         objc_setAssociatedObject(deleteWallpaperButton, "wallpaperItem", wallpaperItem, OBJC_ASSOCIATION_ASSIGN);
+        [[wallpaperItem getThumbnailView]addSubview:deleteWallpaperButton];
+    }
+}
+
+-(IBAction)didTouchDeleteWallpaper:(id)sender{
+    WallpaperItem *wallpaperItem = objc_getAssociatedObject(sender, "wallpaperItem");
+    [[wallpaperItem getThumbnailView] removeFromSuperview];
+    [[wallpaperItem getWallpaperView] removeFromSuperview];
+    [wallpaperItem deleteData];
+    int index = [wallpaperItems indexOfObject:wallpaperItem];
+    [wallpaperItems removeObject: wallpaperItem];
+    NSLog(@"removed it");
+
+
+    for(int i=index; i< [wallpaperItems count]; i++){
+        WallpaperItem *wallpaperItem= [wallpaperItems objectAtIndex:i];
+        CGFloat wallpaperXOrigin = ((DISPLAY_WIDTH - WALLPAPER_WIDTH)/2) + (i * (WALLPAPER_WIDTH + WALLPAPER_PADDING));
+        [wallpaperItem setWallpaperViewFrame: CGRectMake(wallpaperXOrigin,0,WALLPAPER_WIDTH, WALLPAPER_HEIGHT)];
+        
+        CGFloat thumbnailXOrigin = ((DISPLAY_WIDTH - THUMBNAIL_SIZE)/2) + (i * (THUMBNAIL_SIZE + WALLPAPER_PADDING));
+        
+        [wallpaperItem setThumbnailViewFrame:CGRectMake(thumbnailXOrigin,0,THUMBNAIL_SIZE, THUMBNAIL_SIZE)];
+  
+    }
+    
 }
 
 
-- (void)didReceiveMemoryWarning
+- (void)didReceiveMemoryWarningƒ
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
@@ -263,39 +291,36 @@ static NSMutableArray *wallpaperViews;
 	   
 	for(NSDictionary *dict in info) {
         UIImage *image = [dict objectForKey:UIImagePickerControllerOriginalImage];
-        CGFloat wallpaperXOrigin = ((DISPLAY_WIDTH - WALLPAPER_WIDTH)/2) + [wallpaperViews count] * (WALLPAPER_WIDTH + WALLPAPER_PADDING);
+        CGFloat wallpaperXOrigin = ((DISPLAY_WIDTH - WALLPAPER_WIDTH)/2) + [wallpaperItems count] * (WALLPAPER_WIDTH + WALLPAPER_PADDING);
         
         UIImage *wallpaper = [WallpaperProcessor process: image ];
         UIImage *thumbnail = [WallpaperProcessor makeThumbnail: image];
-        WallpaperView *wallpaperView = [[WallpaperView alloc] initWithWallpaper:wallpaper andBackground:image andThumbnail:thumbnail];
-        [wallpaperView setFrame:CGRectMake(wallpaperXOrigin,0,WALLPAPER_WIDTH,WALLPAPER_HEIGHT)];
-
-        [wallpaperScrollView addSubview:wallpaperView];
+        WallpaperItem *wallpaperItem = [[WallpaperItem alloc] initWithWallpaper:wallpaper andBackground:image andThumbnail:thumbnail];
+        
+        [[wallpaperItem getWallpaperView ] setFrame:CGRectMake(wallpaperXOrigin,0,WALLPAPER_WIDTH,WALLPAPER_HEIGHT)];
+        [wallpaperScrollView addSubview: [wallpaperItem getWallpaperView]];
         UITapGestureRecognizer *wallpaperTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didTouchWallpaper:)];
         wallpaperTap.numberOfTouchesRequired = 1;
         wallpaperTap.numberOfTapsRequired = 1;
-        objc_setAssociatedObject(wallpaperTap, "wallpaperImage", wallpaperView, OBJC_ASSOCIATION_ASSIGN);
-        [wallpaperView addGestureRecognizer:wallpaperTap];
+        objc_setAssociatedObject(wallpaperTap, "wallpaperItem", wallpaperItem, OBJC_ASSOCIATION_ASSIGN);
+        [[wallpaperItem getWallpaperView] addGestureRecognizer:wallpaperTap];
  
-        CGFloat thumbnailXOrigin = ((DISPLAY_WIDTH - THUMBNAIL_SIZE)/2) + [wallpaperViews count] * (THUMBNAIL_SIZE + WALLPAPER_PADDING);
-		UIImageView *thumbnailImageView = [[UIImageView alloc] initWithFrame:CGRectMake(thumbnailXOrigin,0,THUMBNAIL_SIZE, THUMBNAIL_SIZE)];
-        [thumbnailImageView setImage:thumbnail];
-        [thumbnailScrollView addSubview:thumbnailImageView];
-        thumbnailImageView.userInteractionEnabled = YES;
-        UITapGestureRecognizer *thumbnailTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didTouchThumbnail:)];
-        thumbnailTap.numberOfTouchesRequired = 1;
-        thumbnailTap.numberOfTapsRequired = 1;
-        objc_setAssociatedObject(thumbnailTap, "wallpaperImage", wallpaperView, OBJC_ASSOCIATION_ASSIGN);
-        [thumbnailImageView addGestureRecognizer:thumbnailTap];
-        
-        [wallpaperViews addObject:wallpaperView];
-        [wallpaperView saveData];
+        CGFloat thumbnailXOrigin = ((DISPLAY_WIDTH - THUMBNAIL_SIZE)/2) + [wallpaperItems count] * (THUMBNAIL_SIZE + WALLPAPER_PADDING);
+		[wallpaperItem setThumbnailViewFrame: CGRectMake(thumbnailXOrigin,0,THUMBNAIL_SIZE, THUMBNAIL_SIZE)];
+        [thumbnailScrollView addSubview:[wallpaperItem getThumbnailView]];
+        UILongPressGestureRecognizer *thumbnailLongPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(didLongPressThumbnail:)];
+        thumbnailLongPress.numberOfTouchesRequired = 1;
+        thumbnailLongPress.minimumPressDuration = 1;
+        objc_setAssociatedObject(thumbnailLongPress, "wallpaperItem", wallpaperItem, OBJC_ASSOCIATION_ASSIGN);
+        [[wallpaperItem getThumbnailView] addGestureRecognizer:thumbnailLongPress];
+        [wallpaperItems addObject:wallpaperItem];
+        [wallpaperItem saveData];
 
     }
     
-    wallpaperScrollView.contentSize = CGSizeMake([wallpaperViews count] * (WALLPAPER_WIDTH + WALLPAPER_PADDING), WALLPAPER_HEIGHT);
+    wallpaperScrollView.contentSize = CGSizeMake([wallpaperItems count] * (WALLPAPER_WIDTH + WALLPAPER_PADDING), WALLPAPER_HEIGHT);
     
-    thumbnailScrollView.contentSize = CGSizeMake([wallpaperViews count] * (THUMBNAIL_SIZE + WALLPAPER_PADDING), THUMBNAIL_SIZE);
+    thumbnailScrollView.contentSize = CGSizeMake([wallpaperItems count] * (THUMBNAIL_SIZE + WALLPAPER_PADDING), THUMBNAIL_SIZE);
 		
 }
 

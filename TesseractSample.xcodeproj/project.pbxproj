@@ -44,7 +44,7 @@
 		62F2C40317FA56DA00C15DA7 /* wallpaper1.png in Resources */ = {isa = PBXBuildFile; fileRef = 62F2C3E417FA56DA00C15DA7 /* wallpaper1.png */; };
 		62F2C40417FA56DA00C15DA7 /* wallpaper2.png in Resources */ = {isa = PBXBuildFile; fileRef = 62F2C3E517FA56DA00C15DA7 /* wallpaper2.png */; };
 		62F2C41117FA570E00C15DA7 /* WallpaperDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F2C40617FA570E00C15DA7 /* WallpaperDatabase.m */; };
-		62F2C41217FA570E00C15DA7 /* WallpaperView.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F2C40817FA570E00C15DA7 /* WallpaperView.m */; };
+		62F2C41217FA570E00C15DA7 /* WallpaperItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F2C40817FA570E00C15DA7 /* WallpaperItem.m */; };
 		62F2C41317FA570E00C15DA7 /* WallpaperProcessor.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F2C40A17FA570E00C15DA7 /* WallpaperProcessor.m */; };
 		62F2C41417FA570E00C15DA7 /* WallpaperZoomController.m in Sources */ = {isa = PBXBuildFile; fileRef = 62F2C40C17FA570E00C15DA7 /* WallpaperZoomController.m */; };
 		62F2C41517FA570E00C15DA7 /* WallpaperZoomController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 62F2C40D17FA570E00C15DA7 /* WallpaperZoomController.xib */; };
@@ -250,8 +250,8 @@
 		62F2C3E517FA56DA00C15DA7 /* wallpaper2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = wallpaper2.png; sourceTree = "<group>"; };
 		62F2C40517FA570E00C15DA7 /* WallpaperDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WallpaperDatabase.h; sourceTree = "<group>"; };
 		62F2C40617FA570E00C15DA7 /* WallpaperDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WallpaperDatabase.m; sourceTree = "<group>"; };
-		62F2C40717FA570E00C15DA7 /* WallpaperView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WallpaperView.h; sourceTree = "<group>"; };
-		62F2C40817FA570E00C15DA7 /* WallpaperView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WallpaperView.m; sourceTree = "<group>"; };
+		62F2C40717FA570E00C15DA7 /* WallpaperItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WallpaperItem.h; sourceTree = "<group>"; };
+		62F2C40817FA570E00C15DA7 /* WallpaperItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WallpaperItem.m; sourceTree = "<group>"; };
 		62F2C40917FA570E00C15DA7 /* WallpaperProcessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WallpaperProcessor.h; sourceTree = "<group>"; };
 		62F2C40A17FA570E00C15DA7 /* WallpaperProcessor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WallpaperProcessor.m; sourceTree = "<group>"; };
 		62F2C40B17FA570E00C15DA7 /* WallpaperZoomController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WallpaperZoomController.h; sourceTree = "<group>"; };
@@ -534,8 +534,8 @@
 			children = (
 				62F2C40517FA570E00C15DA7 /* WallpaperDatabase.h */,
 				62F2C40617FA570E00C15DA7 /* WallpaperDatabase.m */,
-				62F2C40717FA570E00C15DA7 /* WallpaperView.h */,
-				62F2C40817FA570E00C15DA7 /* WallpaperView.m */,
+				62F2C40717FA570E00C15DA7 /* WallpaperItem.h */,
+				62F2C40817FA570E00C15DA7 /* WallpaperItem.m */,
 				62F2C40E17FA570E00C15DA7 /* WWallpaperController.h */,
 				62F2C40F17FA570E00C15DA7 /* WWallpaperController.m */,
 				62F2C40917FA570E00C15DA7 /* WallpaperProcessor.h */,
@@ -687,7 +687,7 @@
 				62F2C3EE17FA56DA00C15DA7 /* ELCImagePickerController.m in Sources */,
 				62F2C3EB17FA56DA00C15DA7 /* ELCAsset.m in Sources */,
 				62F2C41117FA570E00C15DA7 /* WallpaperDatabase.m in Sources */,
-				62F2C41217FA570E00C15DA7 /* WallpaperView.m in Sources */,
+				62F2C41217FA570E00C15DA7 /* WallpaperItem.m in Sources */,
 				62F2C41317FA570E00C15DA7 /* WallpaperProcessor.m in Sources */,
 				62F2C3E617FA56DA00C15DA7 /* AppDelegate.m in Sources */,
 				62F2C41417FA570E00C15DA7 /* WallpaperZoomController.m in Sources */,
