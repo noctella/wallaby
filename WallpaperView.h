@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface WallpaperImage : UIImage{
+@interface WallpaperView : UIImageView{
     UIImage *wallpaper;
     UIImage *background;
     UIImage *thumbnail;
@@ -23,5 +23,6 @@
 - (void) setWallpaper: (UIImage *) image;
 - (void) saveData;
 - (void) deleteData;
+
 
 @end

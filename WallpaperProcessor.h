@@ -13,7 +13,6 @@
 + (UIImage *) template;
 + (UIImage *) mask;
 + (void) setTemplate: (UIImage *) screen;
-+ (UIImage *)processHomescreen: (UIImage *)homescreen;
 + (UIImage *)process: (UIImage *)wallpaper;
 +(UIImage *)makeThumbnail: (UIImage *)image;
 

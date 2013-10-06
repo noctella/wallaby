@@ -6,13 +6,13 @@
 //  Copyright (c) 2013 Loïs Di Qual. All rights reserved.
 //
 
-#import "WallpaperImage.h"
+#import "WallpaperView.h"
 #import "WallpaperDatabase.h"
 #define WALLPAPER_IMAGE_FILE @"wallpaper.png"
 #define BACKGROUND_IMAGE_FILE @"background.png"
 #define THUMBNAIL_IMAGE_FILE @"thumbnail.png"
 
-@implementation WallpaperImage
+@implementation WallpaperView
 
 
 -(id)initWithWallpaper: (UIImage *)wallpaperImage andBackground: (UIImage *) backgroundImage andThumbnail: (UIImage *)thumbnailImage{
@@ -26,6 +26,10 @@
         [self saveWallpaper];
         [self saveBackground];
         [self saveThumbnail];
+        [self setImage:wallpaper];
+        NSLog(@"seet the wallpaper");
+
+        self.userInteractionEnabled = YES;
     }
     return self;
     
@@ -36,7 +40,12 @@
     self = [super init];
     if(self){
          docPath = path;
+         self.userInteractionEnabled = YES;
+        wallpaper = [self getWallpaper];
+        [self setImage: wallpaper];
+        
     }
+    
     return self;
 }
 
@@ -48,6 +57,7 @@
 
 -(void) setWallpaper: (UIImage *) image{
     wallpaper = image;
+    [self setImage:wallpaper];
     [self saveWallpaper];
 }
 

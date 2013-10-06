@@ -7,7 +7,7 @@
 //
 
 #import "WallpaperDatabase.h"
-#import "WallpaperImage.h"
+#import "WallpaperView.h"
 #define HOMESCREEN_IMAGE_FILE @"homescreen.png"
 
 @implementation WallpaperDatabase
@@ -62,8 +62,8 @@
     for (NSString *file in files) {
         if ([file.pathExtension compare:@"wallpaperImage" options:NSCaseInsensitiveSearch] == NSOrderedSame) {
             NSString *fullFolderPath = [documentsDirectory stringByAppendingPathComponent:file];
-            WallpaperImage *wallpaperImage = [[WallpaperImage alloc]initWithFolderPath: fullFolderPath];
-            [wallpapers addObject:wallpaperImage];
+            WallpaperView *wallpaperView = [[WallpaperView alloc]initWithFolderPath: fullFolderPath];
+            [wallpapers addObject:wallpaperView];
         
         }
     }
