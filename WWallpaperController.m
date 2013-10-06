@@ -31,11 +31,12 @@
 #define DISPLAY_WIDTH 320
 #define DISPLAY_HEIGHT 568
 #define WALLPAPER_SCALE 0.77
-#define WALLPAPER_WIDTH (DISPLAY_WIDTH*WALLPAPER_SCALE)
+#define WALLPAPER_WIDTH 250.0
 #define WALLPAPER_HEIGHT (DISPLAY_HEIGHT*WALLPAPER_SCALE)
-#define WALLPAPER_PADDING 4
+#define WALLPAPER_PADDING 4.0
 #define STATUS_HEIGHT 23
 #define RATIO 2.419
+#define RATIO_WITH_PADDING ((WALLPAPER_WIDTH + WALLPAPER_PADDING) / (THUMBNAIL_SIZE + WALLPAPER_PADDING))
 
 #define THUMBNAIL_SIZE (WALLPAPER_WIDTH/RATIO)
 
@@ -122,12 +123,12 @@ static NSMutableArray *wallpaperViews;
 
 - (void)updateWallpaperContentOffset {
     CGFloat offsetX   = wallpaperScrollView.contentOffset.x;
-   thumbnailScrollView.contentOffset = CGPointMake(offsetX/RATIO, 0.0f);
+   thumbnailScrollView.contentOffset = CGPointMake(offsetX/RATIO_WITH_PADDING, 0.0f);
 }
 
 - (void)updateThumbnailContentOffset {
     CGFloat offsetX   = thumbnailScrollView.contentOffset.x;
-    wallpaperScrollView.contentOffset = CGPointMake(offsetX*RATIO, 0.0f);
+    wallpaperScrollView.contentOffset = CGPointMake(offsetX*RATIO_WITH_PADDING, 0.0f);
 }
 
 - (void)viewDidLoad
@@ -162,7 +163,7 @@ static NSMutableArray *wallpaperViews;
 
 	for (int i = 0; i < [wallpaperViews count]; i++) {
   
-		CGFloat wallpaperXOrigin = ((DISPLAY_WIDTH - WALLPAPER_WIDTH)/2) + i * (WALLPAPER_WIDTH + WALLPAPER_PADDING);
+		CGFloat wallpaperXOrigin = ((DISPLAY_WIDTH - WALLPAPER_WIDTH)/2) + (i * (WALLPAPER_WIDTH + WALLPAPER_PADDING));
          WallpaperView *wallpaperView = [wallpaperViews objectAtIndex:i];
         [wallpaperView setFrame: CGRectMake(wallpaperXOrigin,0,WALLPAPER_WIDTH, WALLPAPER_HEIGHT)];
         [wallpaperScrollView addSubview:wallpaperView];
@@ -174,6 +175,8 @@ static NSMutableArray *wallpaperViews;
         [wallpaperView addGestureRecognizer:wallpaperTap];
         
         CGFloat thumbnailXOrigin = ((DISPLAY_WIDTH - THUMBNAIL_SIZE)/2) + (i * (THUMBNAIL_SIZE + WALLPAPER_PADDING));
+        NSLog(@"starter:%f", (i * (WALLPAPER_WIDTH + WALLPAPER_PADDING)));
+
 		UIImageView *thumbnailImageView = [[UIImageView alloc] initWithFrame:CGRectMake(thumbnailXOrigin,0,THUMBNAIL_SIZE, THUMBNAIL_SIZE)];
         UIImage *thumbnail = [[wallpaperViews objectAtIndex:i]getThumbnail];
         [thumbnailImageView setImage:thumbnail];
