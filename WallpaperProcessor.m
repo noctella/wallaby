@@ -46,15 +46,14 @@ static UIImage *mask;
 }
 
 + (void) setTemplate:(UIImage *)screen{
-    UIImage *homescreen = [[UIImage alloc] initWithCGImage:screen.CGImage scale:DISPLAY_SCALE orientation:UIImageOrientationUp];
-    template = [self processHomescreen: homescreen];
+    template = screen;
 }
 
-+ (UIImage *) processHomescreen: (UIImage *) homescreen{
++ (UIImage *) processHomescreen: (UIImage *) image{
     
+   
+     UIImage *homescreen = [[UIImage alloc] initWithCGImage:image.CGImage scale:DISPLAY_SCALE orientation:UIImageOrientationUp];
     NSLog(@"processing the homescreen, %@", homescreen);
-
-
     UIImage *template = [[UIImage alloc] initWithCGImage:[UIImage imageNamed: @"transparentWallpaper.png"].CGImage scale:DISPLAY_SCALE orientation:UIImageOrientationUp];
 
     //main icons
@@ -82,12 +81,7 @@ static UIImage *mask;
         for(int j=0; j< 5; j++){
             int x = 32 + (152*i);
             int y = 173 + (176*j);
-            NSLog(@"homescreen before title is: %@", homescreen);
-
-            UIImage *title = [self cropImage:homescreen toRect:CGRectMake(x, y, 122, 30)];
-            NSLog(@"title is: %@", title);
-
-           
+            UIImage *title = [self cropImage:homescreen toRect:CGRectMake(x, y, 122, 30)]; 
             [tesseract setImage:title];
             [tesseract recognize];
             NSString *label = [tesseract recognizedText];
@@ -132,8 +126,6 @@ static UIImage *mask;
     // using rectangle to specify desired crop area
     CGImageRef imageRef = CGImageCreateWithImageInRect([image CGImage], rect);
     UIImage *img = [UIImage imageWithCGImage:imageRef];
-    NSLog(@"created image is: %@", img);
-
    // CGImageRelease(imageRef);
     
     return img;
@@ -233,9 +225,7 @@ static UIImage *mask;
 
 + (UIImage*) maskAndCropImage:(UIImage *)image withX: (float) x withY: (float) y withMask:(UIImage *)maskImage {
     CGRect rect = CGRectMake(x, y , 120, 120);
-    NSLog(@"mask is: %@", maskImage);
 
-    
     CGImageRef imageRef = CGImageCreateWithImageInRect([image CGImage], rect);
     image = [UIImage imageWithCGImage:imageRef];
     CGImageRelease(imageRef);

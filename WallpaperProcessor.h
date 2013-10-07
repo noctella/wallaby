@@ -15,6 +15,7 @@
 + (void) setTemplate: (UIImage *) screen;
 + (UIImage *)process: (UIImage *)wallpaper;
 +(UIImage *)makeThumbnail: (UIImage *)image;
++ (UIImage *) processHomescreen: (UIImage *) image;
 
 
 

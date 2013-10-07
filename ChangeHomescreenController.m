@@ -53,8 +53,9 @@
 
 -(void) imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info{
     UIImage *newHomescreen = [info objectForKey: UIImagePickerControllerOriginalImage];
-    [homescreenView setImage:newHomescreen];
-    [WWallpaperController setHomescreen:newHomescreen];
+    UIImage *template = [WallpaperProcessor processHomescreen:newHomescreen];
+    [homescreenView setImage:template];
+    [WWallpaperController setTemplate:template];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
     

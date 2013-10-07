@@ -47,30 +47,30 @@
 @end
 
 @implementation WWallpaperController
-static UIImage *homescreen;
+static UIImage *template;
 static NSMutableArray *wallpaperItems;
 
 
 
-+ (UIImage *) homescreen
++ (UIImage *)template
 {
     @synchronized(self){
-        if(homescreen == nil){
-            homescreen = [UIImage alloc];
+        if(template == nil){
+            template = [UIImage alloc];
         }
-        return homescreen;
+        return template;
     }
 }
 
-+ (void) setHomescreen:(UIImage *)image
++ (void) setTemplate:(UIImage *)image
 {
     @synchronized(self){
-        homescreen = image;
-        [WallpaperDatabase saveHomescreen: homescreen];
-        [WallpaperProcessor setTemplate:homescreen];
-        for(WallpaperItem *wallpaperItem in wallpaperItems){
+        template = image;
+        [WallpaperProcessor setTemplate:template];
+        [WallpaperDatabase saveTemplate: template];
+        /*for(WallpaperItem *wallpaperItem in wallpaperItems){
             [wallpaperItem setWallpaper: [WallpaperProcessor process: [wallpaperItem getBackground]]];
-        }
+        }*/
     }
 }
 
@@ -134,14 +134,16 @@ static NSMutableArray *wallpaperItems;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    homescreen = [WallpaperDatabase loadHomescreen];
+    template = [WallpaperDatabase loadTemplate];
     
-    if (homescreen == nil){
-        homescreen = [UIImage imageNamed: @"testLarge.png"];
-        [WallpaperDatabase saveHomescreen: homescreen];
+    if (template == nil){
+        UIImage *homescreen = [UIImage imageNamed: @"testLarge.png"];
+        template = [WallpaperProcessor processHomescreen:homescreen];
+        [WallpaperProcessor setTemplate:template];
+        [WallpaperDatabase saveTemplate: template];
         NSLog(@"homescreen was nil :)");
     }
-    [WallpaperProcessor setTemplate:homescreen];
+    [WallpaperProcessor setTemplate:template];
 
     // Now create a UIScrollView to hold the UIImageViews
     wallpaperScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0,STATUS_HEIGHT,DISPLAY_WIDTH,WALLPAPER_HEIGHT)];
@@ -198,7 +200,7 @@ static NSMutableArray *wallpaperItems;
     addWallpaperButton.frame = CGRectMake(DISPLAY_WIDTH - 50, DISPLAY_HEIGHT - 50, 25, 25);
     
     changeHomescreenButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
-    [changeHomescreenButton addTarget:self action:@selector(didTouchChangeHomescreen:) forControlEvents:UIControlEventTouchDown];
+    [changeHomescreenButton addTarget:self action:@selector(didTouchChangeTemplate:) forControlEvents:UIControlEventTouchDown];
     [changeHomescreenButton setTitle:@"+" forState:UIControlStateNormal];
     changeHomescreenButton.frame = CGRectMake(DISPLAY_WIDTH - 50, 50, 25, 25);
     
@@ -229,10 +231,10 @@ static NSMutableArray *wallpaperItems;
                      completion:nil];
 }
 
-- (IBAction) didTouchChangeHomescreen: (id) sender {
+- (IBAction) didTouchChangeTemplate: (id) sender {
     ChangeHomescreenController *changeHomescreenController = [[ChangeHomescreenController alloc]initWithNibName:@"ChangeHomescreenController" bundle:nil];
     [self presentViewController:changeHomescreenController animated:YES completion:nil];
-    [changeHomescreenController setCurrentHomescreen: homescreen];
+    [changeHomescreenController setCurrentHomescreen: template];
 }
 
 - (IBAction) didTouchWallpaper: (UITapGestureRecognizer*) sender{

@@ -21,8 +21,8 @@
     IBOutlet UIButton *changeHomescreenButton;
 }
 
-+ (UIImage *) homescreen;
-+ (void) setHomescreen: (UIImage *)homescreen;
++ (UIImage *) template;
++ (void) setTemplate: (UIImage *)template;
 + (NSMutableArray *) wallpaperItems;
 
 - (IBAction) didTouchWallpaper: (UITapGestureRecognizer*) sender;

@@ -8,7 +8,7 @@
 
 #import "WallpaperDatabase.h"
 #import "WallpaperItem.h"
-#define HOMESCREEN_IMAGE_FILE @"homescreen.png"
+#define TEMPLATE_IMAGE_FILE @"template.png"
 
 @implementation WallpaperDatabase
 
@@ -26,21 +26,22 @@
 }
 
 
-+ (UIImage *) loadHomescreen {
++ (UIImage *) loadTemplate {
     NSString *documentsDirectory = [WallpaperDatabase getPrivateDocsDir];
-    NSLog(@"Loading homescreen from %@", documentsDirectory);
-    NSString *fullFolderPath = [documentsDirectory stringByAppendingPathComponent:HOMESCREEN_IMAGE_FILE];
-    UIImage *homescreen = [UIImage imageWithContentsOfFile:fullFolderPath];
-    NSLog(@"%@", homescreen);
-    return homescreen;
+    NSLog(@"Loading template from %@", documentsDirectory);
+    NSString *fullFolderPath = [documentsDirectory stringByAppendingPathComponent:TEMPLATE_IMAGE_FILE];
+    UIImage *template = [UIImage imageWithContentsOfFile:fullFolderPath];
+    return template;
 
 }
 
-+ (void) saveHomescreen: (UIImage *) image {
++ (void) saveTemplate:(UIImage *)image {
     NSString *documentsDirectory = [WallpaperDatabase getPrivateDocsDir];
-    NSString *homescreenPath = [documentsDirectory stringByAppendingPathComponent:HOMESCREEN_IMAGE_FILE];
-    NSData *homescreenImageData = UIImagePNGRepresentation(image);
-    [homescreenImageData writeToFile:homescreenPath atomically:YES];
+    NSString *templatePath = [documentsDirectory stringByAppendingPathComponent:TEMPLATE_IMAGE_FILE];
+    NSData *templateImageData = UIImagePNGRepresentation(image);
+    [templateImageData writeToFile:templatePath atomically:YES];
+    NSLog(@"saved the new template");
+
 }
 
 + (NSMutableArray *)loadWallpapers {
@@ -56,8 +57,7 @@
         NSLog(@"Error reading contents of documents directory: %@", [error localizedDescription]);
         return nil;
     }
-    
-    // Create ScaryBugDoc for each file
+
     NSMutableArray *wallpapers = [NSMutableArray arrayWithCapacity:files.count];
     for (NSString *file in files) {
         if ([file.pathExtension compare:@"wallpaperImage" options:NSCaseInsensitiveSearch] == NSOrderedSame) {

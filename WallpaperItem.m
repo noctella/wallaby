@@ -44,13 +44,13 @@
     if(self){
          docPath = path;
 
-        thumbnail = [self getThumbnail];
+        /*thumbnail = [self getThumbnail];
         thumbnailView = [[UIImageView alloc]initWithImage:thumbnail];
         thumbnailView.userInteractionEnabled = YES;
         
         wallpaper = [self getWallpaper];
         wallpaperView = [[UIImageView alloc]initWithImage:wallpaper];
-        wallpaperView.userInteractionEnabled = YES;
+        wallpaperView.userInteractionEnabled = YES;*/
         
     }
     
