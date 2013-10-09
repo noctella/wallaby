@@ -19,6 +19,8 @@
     NSString *_docPath;
     IBOutlet UIButton *addWallpaperButton;
     IBOutlet UIButton *changeHomescreenButton;
+    int wallpaperRightIndex;
+    int wallpaperLeftIndex;
 }
 
 + (UIImage *) template;
