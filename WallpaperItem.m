@@ -38,19 +38,31 @@
     
 }
 
+-(void)loadData{
+    NSLog(@"loading data");
+
+    if(thumbnail == nil){
+        thumbnail = [self getThumbnail];
+        [thumbnailView setImage:thumbnail];
+    
+        wallpaper = [self getWallpaper];
+        [wallpaperView setImage:wallpaper];
+    }
+}
+
 - (id)initWithFolderPath:(NSString *)path
 {
     self = [super init];
     if(self){
          docPath = path;
 
-        /*thumbnail = [self getThumbnail];
-        thumbnailView = [[UIImageView alloc]initWithImage:thumbnail];
+        
+        thumbnailView = [[UIImageView alloc]init];
         thumbnailView.userInteractionEnabled = YES;
         
         wallpaper = [self getWallpaper];
-        wallpaperView = [[UIImageView alloc]initWithImage:wallpaper];
-        wallpaperView.userInteractionEnabled = YES;*/
+        wallpaperView = [[UIImageView alloc]init];
+        wallpaperView.userInteractionEnabled = YES;
         
     }
     

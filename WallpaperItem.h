@@ -31,6 +31,7 @@
 - (void) deleteData;
 - (void) setThumbnailViewFrame: (CGRect) frame;
 - (void) setWallpaperViewFrame: (CGRect) frame;
+-(void) loadData;
 
 
 
