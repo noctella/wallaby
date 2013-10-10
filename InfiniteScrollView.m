@@ -88,6 +88,7 @@
         [self setShowsHorizontalScrollIndicator:NO];
         [self setPagingEnabled: NO];
         [self setIndicatorStyle:UIScrollViewIndicatorStyleWhite];
+        //[self tileWallpaperViewsFromMinX:0 toMaxX:self.contentSize.width];
     }
     return self;
 }

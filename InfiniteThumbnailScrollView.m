@@ -33,7 +33,7 @@
         wallpaperItems = items;
         thumbnailRightIndex = 0;
         thumbnailLeftIndex = [wallpaperItems count]-1;
-        oldContentOffsetX=0;
+        oldTrueContentOffsetX=0;
         
         visibleThumbnails = [[NSMutableArray alloc] init];
         
@@ -60,6 +60,7 @@
     if (distanceFromCenter > (contentWidth / 4.0))
     {
         self.contentOffset = CGPointMake(centerOffsetX, currentOffset.y);
+        oldTrueContentOffsetX = self.contentOffset.x;
         
         // move content by the same amount so it appears to stay still
         for (UIImageView *imageView in visibleThumbnails) {
@@ -70,13 +71,17 @@
 }
 - (void)layoutSubviews
 {
+    trueContentOffsetX   = self.contentOffset.x;
+    pairedScrollView.contentOffset = CGPointMake(pairedScrollView.contentOffset.x + (trueContentOffsetX - oldTrueContentOffsetX)/RATIO_WITH_PADDING, 0.0f);
+    oldTrueContentOffsetX = trueContentOffsetX ;
+    
     [super layoutSubviews];
     [self recenterIfNecessary];
     [self tileThumbnailViewsFromMinX:0 toMaxX:self.contentSize.width];
+    NSLog(@"going to scroll: %f", (trueContentOffsetX - oldTrueContentOffsetX)/RATIO_WITH_PADDING);
+
     
-    CGFloat offsetX   = self.contentOffset.x;
-    pairedScrollView.contentOffset = CGPointMake(pairedScrollView.contentOffset.x + (offsetX - oldContentOffsetX)/RATIO_WITH_PADDING, 0.0f);
-    oldContentOffsetX = offsetX;
+    
     
 }
 

@@ -14,7 +14,8 @@
     int thumbnailRightIndex;
     int thumbnailLeftIndex;
     UIScrollView *pairedScrollView;
-    float oldContentOffsetX;
+    float oldTrueContentOffsetX;
+    float trueContentOffsetX;
 }
 - (id)initWithWallpaperItems:(NSMutableArray*)items;
 - (void)setPairedScrollView: (UIScrollView *)scrollView;
