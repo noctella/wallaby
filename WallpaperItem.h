@@ -15,7 +15,7 @@
     NSString *docPath;
     UIImageView *thumbnailView;
     UIImageView *wallpaperView;
-    int index;
+    NSString *index;
     
 }
 
@@ -31,6 +31,8 @@
 - (void) deleteData;
 - (void) setThumbnailViewFrame: (CGRect) frame;
 - (void) setWallpaperViewFrame: (CGRect) frame;
+-(void)setIndex: (NSString *) index;
+-(NSString *)getIndex;
 -(void) loadData;
 
 

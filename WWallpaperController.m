@@ -93,8 +93,7 @@ static NSMutableArray *wallpaperTapGestureRecognizers;
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         wallpaperItems = [WallpaperDatabase loadWallpapers];
-        wallpaperRightIndex = 0;
-        wallpaperLeftIndex = [wallpaperItems count]-1;
+       
         visibleWallpapers = [[NSMutableArray alloc]init];
         wallpaperTapGestureRecognizers = [[NSMutableArray alloc]initWithCapacity:BUFFER_SIZE];
         NSLog(@"creating view controller");
@@ -107,113 +106,11 @@ static NSMutableArray *wallpaperTapGestureRecognizers;
         [self updateWallpaperContentOffset];
     }else if(scrollView == thumbnailScrollView){
         [self updateThumbnailContentOffset];
-    }
-    
-    
-    if ([self.scrollViewDelegate respondsToSelector:_cmd]) {
-        [self.scrollViewDelegate scrollViewDidScroll:scrollView];
     }*/
-    [self recenterIfNecessary];
     
-    CGFloat minimumVisibleX = CGRectGetMinX([wallpaperScrollView bounds]);
-    CGFloat maximumVisibleX = CGRectGetMaxX([wallpaperScrollView bounds]);
-    
-    
-    
-    //[self tileWallpaperViewsFromMinX:minimumVisibleX toMaxX:maximumVisibleX];
-    [self tileWallpaperViewsFromMinX:wallpaperScrollView.contentSize.width *0.25 toMaxX:wallpaperScrollView.contentSize.width * 0.75];
 }
 
-- (UIImageView *)insertWallpaperView
-{
-    UIImageView *wallpaperImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, WALLPAPER_WIDTH, WALLPAPER_HEIGHT)];
-    [wallpaperImageView setImage:[[wallpaperItems objectAtIndex:0]getWallpaper]];
-    [wallpaperScrollView addSubview:wallpaperImageView];
-    
-    return wallpaperImageView;
-}
 
-- (CGFloat)placeNewWallpaperImageViewOnRight:(CGFloat)rightEdge
-{
-    UIImageView *wallpaperImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, WALLPAPER_WIDTH, WALLPAPER_HEIGHT)];
-    [wallpaperImageView setImage:[[wallpaperItems objectAtIndex:wallpaperRightIndex]getWallpaper]];
-    wallpaperRightIndex++;
-    if(wallpaperRightIndex == [wallpaperItems count])wallpaperRightIndex = 0;
-    [wallpaperScrollView addSubview:wallpaperImageView];
-
-    [visibleWallpapers addObject:wallpaperImageView]; // add rightmost label at the end of the array
-    
-    CGRect frame = [wallpaperImageView frame];
-    frame.origin.x = rightEdge;
-    frame.origin.y = [wallpaperScrollView bounds].size.height - frame.size.height;
-    [wallpaperImageView setFrame:frame];
-    
-    return CGRectGetMaxX(frame);
-}
-
-- (CGFloat)placeNewWallpaperImageViewOnLeft:(CGFloat)leftEdge
-{
-    UIImageView *wallpaperImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, WALLPAPER_WIDTH, WALLPAPER_HEIGHT)];
-    [wallpaperImageView setImage:[[wallpaperItems objectAtIndex:wallpaperLeftIndex]getWallpaper]];
-    wallpaperLeftIndex--;
-    if(wallpaperLeftIndex == -1)wallpaperLeftIndex = [wallpaperItems count]-1;
-    [wallpaperScrollView addSubview:wallpaperImageView];
-
-    [visibleWallpapers insertObject:wallpaperImageView atIndex:0]; // add leftmost label at the beginning of the array
-    
-    CGRect frame = [wallpaperImageView frame];
-    frame.origin.x = leftEdge - frame.size.width;
-    frame.origin.y = [wallpaperScrollView bounds].size.height - frame.size.height;
-    [wallpaperImageView setFrame:frame];
-    
-    return CGRectGetMinX(frame);
-}
-
-- (void)tileWallpaperViewsFromMinX:(CGFloat)minimumVisibleX toMaxX:(CGFloat)maximumVisibleX
-{
-    NSLog(@"tiling shit");
-
-    // the upcoming tiling logic depends on there already being at least one label in the visibleLabels array, so
-    // to kick off the tiling we need to make sure there's at least one label
-    if ([visibleWallpapers count] == 0)
-    {
-        [self placeNewWallpaperImageViewOnRight:minimumVisibleX];
-    }
-    
-    // add labels that are missing on right side
-    UIImageView *lastWallpaperImageView = [visibleWallpapers lastObject];
-    CGFloat rightEdge = CGRectGetMaxX([lastWallpaperImageView frame]);  //here's where we'll change the positioning
-    while (rightEdge < maximumVisibleX)
-    {
-        rightEdge = [self placeNewWallpaperImageViewOnRight:rightEdge];
-    }
-    
-    // add labels that are missing on left side
-    UIImageView *firstWallpaperImageView = visibleWallpapers[0];
-    CGFloat leftEdge = CGRectGetMinX([firstWallpaperImageView frame]);
-    while (leftEdge > minimumVisibleX)
-    {
-        leftEdge = [self placeNewWallpaperImageViewOnLeft:leftEdge];
-    }
-    
-    // remove labels that have fallen off right edge
-    lastWallpaperImageView = [visibleWallpapers lastObject];
-    while ([lastWallpaperImageView frame].origin.x > maximumVisibleX)
-    {
-        [lastWallpaperImageView removeFromSuperview];
-        [visibleWallpapers removeLastObject];
-        lastWallpaperImageView = [visibleWallpapers lastObject];
-    }
-    
-    // remove labels that have fallen off left edge
-    firstWallpaperImageView = visibleWallpapers[0];
-    while (CGRectGetMaxX([firstWallpaperImageView frame]) < minimumVisibleX)
-    {
-        [firstWallpaperImageView removeFromSuperview];
-        [visibleWallpapers removeObjectAtIndex:0];
-        firstWallpaperImageView = visibleWallpapers[0];
-    }
-}
 
 
 
@@ -235,28 +132,8 @@ static NSMutableArray *wallpaperTapGestureRecognizers;
    thumbnailScrollView.contentOffset = CGPointMake(offsetX/RATIO_WITH_PADDING, 0.0f);
 }
 
-- (NSRange)getPositiveRangeFromValue: (int)value withSize: (int)size notGreaterThan: (int) ceil
-{
-    int min=value;
-    int max=value;
-    while(size > 0){
-        if(min > 0){
-            min--;
-            size--;
-        }
-        if(max < ceil-1 && size > 0){
-            max++;
-            size--;
-        }
-    }
-    NSRange range;
-    range.location = min;
-    range.length = max-min;
-    return range;
-}
 
 - (void)updateThumbnailContentOffset {
-    [self recenterIfNecessary];
     /*NSInteger visibleWallpaperIndex = offsetX/(WALLPAPER_WIDTH/WALLPAPER_PADDING);
     visibleWallpaperIndex = MIN([wallpaperItems count], visibleWallpaperIndex);
     NSLog(@"visible wallpaper index: %ld", (long)visibleWallpaperIndex);
@@ -269,23 +146,7 @@ static NSMutableArray *wallpaperTapGestureRecognizers;
     
 }
 
-- (void) recenterIfNecessary{
-    CGPoint currentOffset = [wallpaperScrollView contentOffset];
-    CGFloat contentWidth = [wallpaperScrollView contentSize].width;
-    CGFloat centerOffsetX = (contentWidth - [wallpaperScrollView bounds].size.width) / 2.0;
-    CGFloat distanceFromCenter = fabs(currentOffset.x - centerOffsetX);
-    
-    if (distanceFromCenter > (contentWidth / 4.0))
-    {
-        wallpaperScrollView.contentOffset = CGPointMake(centerOffsetX, currentOffset.y);
-        
-        // move content by the same amount so it appears to stay still
-        for (UIImageView *imageView in visibleWallpapers) {
-            [imageView setFrame:CGRectMake(imageView.frame.origin.x + (centerOffsetX - currentOffset.x), imageView.frame.origin.y, imageView.frame.size.width, imageView.frame.size.height)];
-        }
-    }
 
-}
 
 - (void)viewDidLoad
 {
@@ -302,10 +163,11 @@ static NSMutableArray *wallpaperTapGestureRecognizers;
     [WallpaperProcessor setTemplate:template];
 
     // Now create a UIScrollView to hold the UIImageViews
-    wallpaperScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0,STATUS_HEIGHT,DISPLAY_WIDTH,WALLPAPER_HEIGHT)];
-    thumbnailScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0,STATUS_HEIGHT + WALLPAPER_PADDING + WALLPAPER_HEIGHT,325,THUMBNAIL_SIZE)];
-    
-    wallpaperScrollView.delegate = self;
+    wallpaperScrollView = [[InfiniteScrollView alloc]initWithWallpaperItems:wallpaperItems ];
+                           
+                           
+ thumbnailScrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0,STATUS_HEIGHT + WALLPAPER_PADDING + WALLPAPER_HEIGHT,325,THUMBNAIL_SIZE)];
+
 	wallpaperScrollView.pagingEnabled = NO;
     //scrollView.showsHorizontalScrollIndicator = NO;
     wallpaperScrollView.showsVerticalScrollIndicator = NO;
@@ -357,15 +219,17 @@ static NSMutableArray *wallpaperTapGestureRecognizers;
     }*/
     
 
-	wallpaperScrollView.contentSize = CGSizeMake(BUFFER_SIZE * (WALLPAPER_WIDTH + WALLPAPER_PADDING), WALLPAPER_HEIGHT);
+
     
-    [self recenterIfNecessary];
+    /*[self recenterIfNecessary];
     
-    /*CGFloat minimumVisibleX = CGRectGetMinX([wallpaperScrollView bounds]);
+    CGFloat minimumVisibleX = CGRectGetMinX([wallpaperScrollView bounds]);
     CGFloat maximumVisibleX = CGRectGetMaxX([wallpaperScrollView bounds]);
     
-    [self tileWallpaperViewsFromMinX:minimumVisibleX toMaxX:maximumVisibleX];*/
     
+    
+    //[self tileWallpaperViewsFromMinX:minimumVisibleX toMaxX:maximumVisibleX];
+    [self tileWallpaperViewsFromMinX:wallpaperScrollView.contentSize.width *0.25 toMaxX:wallpaperScrollView.contentSize.width * 0.75];*/
     
      thumbnailScrollView.contentSize = CGSizeMake(107 + [visibleWallpapers count] * (WALLPAPER_WIDTH + WALLPAPER_PADDING), THUMBNAIL_SIZE);
     

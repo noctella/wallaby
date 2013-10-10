@@ -19,13 +19,12 @@
     NSString *_docPath;
     IBOutlet UIButton *addWallpaperButton;
     IBOutlet UIButton *changeHomescreenButton;
-    int wallpaperRightIndex;
-    int wallpaperLeftIndex;
 }
 
 + (UIImage *) template;
 + (void) setTemplate: (UIImage *)template;
 + (NSMutableArray *) wallpaperItems;
+
 
 - (IBAction) didTouchWallpaper: (UITapGestureRecognizer*) sender;
 - (IBAction) didLongPressThumbnail: (UILongPressGestureRecognizer *) sender;

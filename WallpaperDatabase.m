@@ -59,10 +59,13 @@
     }
 
     NSMutableArray *wallpapers = [NSMutableArray arrayWithCapacity:files.count];
+    int i=0;
     for (NSString *file in files) {
         if ([file.pathExtension compare:@"wallpaperImage" options:NSCaseInsensitiveSearch] == NSOrderedSame) {
             NSString *fullFolderPath = [documentsDirectory stringByAppendingPathComponent:file];
             WallpaperItem *wallpaperView = [[WallpaperItem alloc]initWithFolderPath: fullFolderPath];
+            [wallpaperView setIndex:file ];
+            i++;
             [wallpapers addObject:wallpaperView];
         
         }

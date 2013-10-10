@@ -45,7 +45,23 @@
  
  */
 
+#define DISPLAY_WIDTH 320
+#define DISPLAY_HEIGHT 568
+#define WALLPAPER_SCALE 0.77
+#define WALLPAPER_WIDTH 250.0
+#define WALLPAPER_HEIGHT (DISPLAY_HEIGHT*WALLPAPER_SCALE)
+#define WALLPAPER_PADDING 4.0
+#define STATUS_HEIGHT 23
+#define RATIO 2.419
+#define RATIO_WITH_PADDING ((WALLPAPER_WIDTH + WALLPAPER_PADDING) / (THUMBNAIL_SIZE + WALLPAPER_PADDING))
+
+#define THUMBNAIL_SIZE (WALLPAPER_WIDTH/RATIO)
+
+#define BUFFER_SIZE 6
+
+
 #import "InfiniteScrollView.h"
+#import "WallpaperItem.h"
 
 @interface InfiniteScrollView ()
 
@@ -57,19 +73,18 @@
 
 @implementation InfiniteScrollView
 
-- (id)initWithCoder:(NSCoder *)aDecoder
+- (id)initWithWallpaperItems:(NSMutableArray*)items;
 {
-    if ((self = [super initWithCoder:aDecoder]))
+    if ((self = [super init]))
     {
-        self.contentSize = CGSizeMake(5000, self.frame.size.height);
-        
-        _visibleLabels = [[NSMutableArray alloc] init];
-        
-        _labelContainerView = [[UIView alloc] init];
-        self.labelContainerView.frame = CGRectMake(0, 0, self.contentSize.width, self.contentSize.height/2);
-        [self addSubview:self.labelContainerView];
+        self.contentSize = 	CGSizeMake(BUFFER_SIZE * (WALLPAPER_WIDTH + WALLPAPER_PADDING), WALLPAPER_HEIGHT);
+        self.frame = CGRectMake(0,STATUS_HEIGHT,DISPLAY_WIDTH,WALLPAPER_HEIGHT);
 
-        [self.labelContainerView setUserInteractionEnabled:NO];
+        wallpaperItems = items;
+        wallpaperRightIndex = 0;
+        wallpaperLeftIndex = [wallpaperItems count]-1;
+        
+        visibleWallpapers = [[NSMutableArray alloc] init];
         
         // hide horizontal scroll indicator so our recentering trick is not revealed
         [self setShowsHorizontalScrollIndicator:NO];
@@ -80,9 +95,7 @@
 
 #pragma mark - Layout
 
-// recenter content periodically to achieve impression of infinite scrolling
-- (void)recenterIfNecessary
-{
+- (void) recenterIfNecessary{
     CGPoint currentOffset = [self contentOffset];
     CGFloat contentWidth = [self contentSize].width;
     CGFloat centerOffsetX = (contentWidth - [self bounds].size.width) / 2.0;
@@ -93,111 +106,115 @@
         self.contentOffset = CGPointMake(centerOffsetX, currentOffset.y);
         
         // move content by the same amount so it appears to stay still
-        for (UILabel *label in self.visibleLabels) {
-            CGPoint center = [self.labelContainerView convertPoint:label.center toView:self];
-            center.x += (centerOffsetX - currentOffset.x);
-            label.center = [self convertPoint:center toView:self.labelContainerView];
+        for (UIImageView *imageView in visibleWallpapers) {
+            [imageView setFrame:CGRectMake(imageView.frame.origin.x + (centerOffsetX - currentOffset.x), imageView.frame.origin.y, imageView.frame.size.width, imageView.frame.size.height)];
         }
     }
+    
 }
-
 - (void)layoutSubviews
 {
     [super layoutSubviews];
-    
     [self recenterIfNecessary];
-    NSLog(@"laying out shit");
-
- 
-    // tile content in visible bounds
-    CGRect visibleBounds = [self convertRect:[self bounds] toView:self.labelContainerView];
-    CGFloat minimumVisibleX = CGRectGetMinX(visibleBounds);
-    CGFloat maximumVisibleX = CGRectGetMaxX(visibleBounds);
-    
-    [self tileLabelsFromMinX:minimumVisibleX toMaxX:maximumVisibleX];
+    [self tileWallpaperViewsFromMinX:0 toMaxX:self.contentSize.width];
 }
 
 
 #pragma mark - Label Tiling
 
-- (UILabel *)insertLabel
+- (UIImageView *)insertWallpaperView
 {
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 500, 80)];
-    [label setNumberOfLines:3];
-    [label setText:@"1024 Block Street\nShaffer, CA\n95014"];
-    [self.labelContainerView addSubview:label];
-
-    return label;
+    UIImageView *wallpaperImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, WALLPAPER_WIDTH, WALLPAPER_HEIGHT)];
+    [wallpaperImageView setImage:[[wallpaperItems objectAtIndex:0]getWallpaper]];
+    [self addSubview:wallpaperImageView];
+    
+    return wallpaperImageView;
 }
 
-- (CGFloat)placeNewLabelOnRight:(CGFloat)rightEdge
+- (CGFloat)placeNewWallpaperImageViewOnRight:(CGFloat)rightEdge
 {
-    UILabel *label = [self insertLabel];
-    [self.visibleLabels addObject:label]; // add rightmost label at the end of the array
+    UIImageView *wallpaperImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, WALLPAPER_WIDTH, WALLPAPER_HEIGHT)];
+    [wallpaperImageView setImage:[[wallpaperItems objectAtIndex:wallpaperRightIndex]getWallpaper]];
     
-    CGRect frame = [label frame];
+    
+    
+    [visibleWallpapers addObject:wallpaperImageView]; // add rightmost label at the end of the array
+    
+    CGRect frame = [wallpaperImageView frame];
     frame.origin.x = rightEdge;
-    frame.origin.y = [self.labelContainerView bounds].size.height - frame.size.height;
-    [label setFrame:frame];
-        
+    frame.origin.y = [self bounds].size.height - frame.size.height;
+    [wallpaperImageView setFrame:frame];
+    [self addSubview:wallpaperImageView];
+    NSLog(@"added wallpaper at index: %d  at position: %f", wallpaperRightIndex, frame.origin.x);
+    wallpaperRightIndex++;
+    if(wallpaperRightIndex == [wallpaperItems count])wallpaperRightIndex = 0;
+    
     return CGRectGetMaxX(frame);
 }
 
-- (CGFloat)placeNewLabelOnLeft:(CGFloat)leftEdge
+- (CGFloat)placeNewWallpaperImageViewOnLeft:(CGFloat)leftEdge
 {
-    UILabel *label = [self insertLabel];
-    [self.visibleLabels insertObject:label atIndex:0]; // add leftmost label at the beginning of the array
+    UIImageView *wallpaperImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, WALLPAPER_WIDTH, WALLPAPER_HEIGHT)];
+    [wallpaperImageView setImage:[[wallpaperItems objectAtIndex:wallpaperLeftIndex]getWallpaper]];
     
-    CGRect frame = [label frame];
+    
+    
+    
+    [visibleWallpapers insertObject:wallpaperImageView atIndex:0]; // add leftmost label at the beginning of the array
+    
+    CGRect frame = [wallpaperImageView frame];
     frame.origin.x = leftEdge - frame.size.width;
-    frame.origin.y = [self.labelContainerView bounds].size.height - frame.size.height;
-    [label setFrame:frame];
+    frame.origin.y = [self bounds].size.height - frame.size.height;
+    [wallpaperImageView setFrame:frame];
+    [self addSubview:wallpaperImageView];
+    NSLog(@"added wallpaper at index: %d  at position: %f", wallpaperLeftIndex, frame.origin.x);
+    wallpaperLeftIndex--;
+    if(wallpaperLeftIndex == -1)wallpaperLeftIndex = [wallpaperItems count]-1;
     
     return CGRectGetMinX(frame);
 }
 
-- (void)tileLabelsFromMinX:(CGFloat)minimumVisibleX toMaxX:(CGFloat)maximumVisibleX
+- (void)tileWallpaperViewsFromMinX:(CGFloat)minimumVisibleX toMaxX:(CGFloat)maximumVisibleX
 {
     // the upcoming tiling logic depends on there already being at least one label in the visibleLabels array, so
     // to kick off the tiling we need to make sure there's at least one label
-    if ([self.visibleLabels count] == 0)
+    if ([visibleWallpapers count] == 0)
     {
-        [self placeNewLabelOnRight:minimumVisibleX];
+        [self placeNewWallpaperImageViewOnRight:minimumVisibleX];
     }
     
     // add labels that are missing on right side
-    UILabel *lastLabel = [self.visibleLabels lastObject];
-    CGFloat rightEdge = CGRectGetMaxX([lastLabel frame]);
+    UIImageView *lastWallpaperImageView = [visibleWallpapers lastObject];
+    CGFloat rightEdge = CGRectGetMaxX([lastWallpaperImageView frame]);  //here's where we'll change the positioning
     while (rightEdge < maximumVisibleX)
     {
-        rightEdge = [self placeNewLabelOnRight:rightEdge];
+        rightEdge = [self placeNewWallpaperImageViewOnRight:rightEdge];
     }
     
     // add labels that are missing on left side
-    UILabel *firstLabel = self.visibleLabels[0];
-    CGFloat leftEdge = CGRectGetMinX([firstLabel frame]);
+    UIImageView *firstWallpaperImageView = visibleWallpapers[0];
+    CGFloat leftEdge = CGRectGetMinX([firstWallpaperImageView frame]);
     while (leftEdge > minimumVisibleX)
     {
-        leftEdge = [self placeNewLabelOnLeft:leftEdge];
+        leftEdge = [self placeNewWallpaperImageViewOnLeft:leftEdge];
     }
     
     // remove labels that have fallen off right edge
-    lastLabel = [self.visibleLabels lastObject];
-    while ([lastLabel frame].origin.x > maximumVisibleX)
+    lastWallpaperImageView = [visibleWallpapers lastObject];
+    while ([lastWallpaperImageView frame].origin.x > maximumVisibleX)
     {
-        [lastLabel removeFromSuperview];
-        [self.visibleLabels removeLastObject];
-        lastLabel = [self.visibleLabels lastObject];
+        [lastWallpaperImageView removeFromSuperview];
+        [visibleWallpapers removeLastObject];
+        lastWallpaperImageView = [visibleWallpapers lastObject];
     }
     
     // remove labels that have fallen off left edge
-    firstLabel = self.visibleLabels[0];
-    while (CGRectGetMaxX([firstLabel frame]) < minimumVisibleX)
+    firstWallpaperImageView = visibleWallpapers[0];
+    while (CGRectGetMaxX([firstWallpaperImageView frame]) < minimumVisibleX)
     {
-        [firstLabel removeFromSuperview];
-        [self.visibleLabels removeObjectAtIndex:0];
-        firstLabel = self.visibleLabels[0];
+        [firstWallpaperImageView removeFromSuperview];
+        [visibleWallpapers removeObjectAtIndex:0];
+        firstWallpaperImageView = visibleWallpapers[0];
     }
 }
-
 @end

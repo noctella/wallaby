@@ -15,6 +15,7 @@
 @implementation WallpaperItem
 
 
+
 -(id)initWithWallpaper: (UIImage *)wallpaperImage andBackground: (UIImage *) backgroundImage andThumbnail: (UIImage *)thumbnailImage{
     self = [super init];
     if(self){
@@ -36,6 +37,14 @@
     }
     return self;
     
+}
+
+-(void)setIndex: (NSString *) i{
+    index = i;
+}
+
+-(int)getIndex{
+    return index;
 }
 
 -(void)loadData{

@@ -47,6 +47,11 @@
 
 #import <UIKit/UIKit.h>
 
-@interface InfiniteScrollView : UIScrollView <UIScrollViewDelegate>
-
+@interface InfiniteScrollView : UIScrollView <UIScrollViewDelegate>{
+    NSMutableArray *visibleWallpapers;
+    NSMutableArray *wallpaperItems;
+    int wallpaperRightIndex;
+    int wallpaperLeftIndex;
+}
+- (id)initWithWallpaperItems:(NSMutableArray*)items;
 @end
