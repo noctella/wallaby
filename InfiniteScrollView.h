@@ -52,6 +52,9 @@
     NSMutableArray *wallpaperItems;
     int wallpaperRightIndex;
     int wallpaperLeftIndex;
+    UIScrollView *pairedScrollView;
+    float oldContentOffset;
 }
 - (id)initWithWallpaperItems:(NSMutableArray*)items;
+- (void)setPairedScrollView: (UIScrollView *)scrollView;
 @end

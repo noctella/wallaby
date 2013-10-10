@@ -9,12 +9,14 @@
 #import <UIKit/UIKit.h>
 #import "WallpaperZoomController.h"
 #import "WallpaperProcessor.h"
+#import "InfiniteScrollView.h"
+#import "InfiniteThumbnailScrollView.h"
 
 @interface WWallpaperController : UIViewController
 <UIImagePickerControllerDelegate, UIGestureRecognizerDelegate>{
     __weak IBOutlet UIImageView *ImageView;
-    IBOutlet UIScrollView *wallpaperScrollView;
-    IBOutlet UIScrollView *thumbnailScrollView;
+    IBOutlet InfiniteScrollView *wallpaperScrollView;
+    IBOutlet InfiniteThumbnailScrollView *thumbnailScrollView;
     WallpaperProcessor *wallpaperProcessor;
     NSString *_docPath;
     IBOutlet UIButton *addWallpaperButton;

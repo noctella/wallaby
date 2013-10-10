@@ -57,16 +57,13 @@
 
 #define THUMBNAIL_SIZE (WALLPAPER_WIDTH/RATIO)
 
-#define BUFFER_SIZE 6
+#define BUFFER_SIZE 5
 
 
 #import "InfiniteScrollView.h"
 #import "WallpaperItem.h"
 
 @interface InfiniteScrollView ()
-
-@property (nonatomic, strong) NSMutableArray *visibleLabels;
-@property (nonatomic, strong) UIView *labelContainerView;
 
 @end
 
@@ -83,15 +80,21 @@
         wallpaperItems = items;
         wallpaperRightIndex = 0;
         wallpaperLeftIndex = [wallpaperItems count]-1;
+        oldContentOffset= 0;
         
         visibleWallpapers = [[NSMutableArray alloc] init];
         
         // hide horizontal scroll indicator so our recentering trick is not revealed
         [self setShowsHorizontalScrollIndicator:NO];
+        [self setPagingEnabled: NO];
+        [self setIndicatorStyle:UIScrollViewIndicatorStyleWhite];
     }
     return self;
 }
 
+-(void)setPairedScrollView: (UIScrollView *)scrollView{
+    pairedScrollView = scrollView;
+}
 
 #pragma mark - Layout
 
@@ -117,6 +120,11 @@
     [super layoutSubviews];
     [self recenterIfNecessary];
     [self tileWallpaperViewsFromMinX:0 toMaxX:self.contentSize.width];
+    
+    CGFloat offsetX   = self.contentOffset.x;
+    //pairedScrollView.contentOffset = CGPointMake(pairedScrollView.contentOffset.x + (offsetX - oldContentOffset)*RATIO_WITH_PADDING, 0.0f);//RATIO_WITH_PADDING, 0.0f);
+    oldContentOffset = offsetX;
+    
 }
 
 
@@ -145,7 +153,6 @@
     frame.origin.y = [self bounds].size.height - frame.size.height;
     [wallpaperImageView setFrame:frame];
     [self addSubview:wallpaperImageView];
-    NSLog(@"added wallpaper at index: %d  at position: %f", wallpaperRightIndex, frame.origin.x);
     wallpaperRightIndex++;
     if(wallpaperRightIndex == [wallpaperItems count])wallpaperRightIndex = 0;
     
@@ -167,7 +174,6 @@
     frame.origin.y = [self bounds].size.height - frame.size.height;
     [wallpaperImageView setFrame:frame];
     [self addSubview:wallpaperImageView];
-    NSLog(@"added wallpaper at index: %d  at position: %f", wallpaperLeftIndex, frame.origin.x);
     wallpaperLeftIndex--;
     if(wallpaperLeftIndex == -1)wallpaperLeftIndex = [wallpaperItems count]-1;
     

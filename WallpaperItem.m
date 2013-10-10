@@ -65,8 +65,10 @@
     if(self){
          docPath = path;
 
+        thumbnail = [self getThumbnail];
         
         thumbnailView = [[UIImageView alloc]init];
+        [thumbnailView setImage:thumbnail];
         thumbnailView.userInteractionEnabled = YES;
         
         wallpaper = [self getWallpaper];
