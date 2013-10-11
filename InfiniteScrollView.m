@@ -61,6 +61,7 @@
 
 
 #import "InfiniteScrollView.h"
+#import "InfiniteThumbnailScrollView.h"
 #import "WallpaperItem.h"
 
 @interface InfiniteScrollView ()
@@ -80,7 +81,8 @@
         wallpaperItems = items;
         wallpaperRightIndex = 0;
         wallpaperLeftIndex = [wallpaperItems count]-1;
-        oldContentOffset= 0;
+        oldTrueContentOffsetX=0;
+        scrolledRemotely = false;
         
         visibleWallpapers = [[NSMutableArray alloc] init];
         
@@ -93,7 +95,7 @@
     return self;
 }
 
--(void)setPairedScrollView: (UIScrollView *)scrollView{
+-(void)setPairedScrollView: (InfiniteThumbnailScrollView *)scrollView{
     pairedScrollView = scrollView;
 }
 
@@ -108,6 +110,7 @@
     if (distanceFromCenter > (contentWidth / 4.0))
     {
         self.contentOffset = CGPointMake(centerOffsetX, currentOffset.y);
+        oldTrueContentOffsetX = self.contentOffset.x;
         
         // move content by the same amount so it appears to stay still
         for (UIImageView *imageView in visibleWallpapers) {
@@ -116,15 +119,25 @@
     }
     
 }
+
+-(void) setscrolledRemotely{
+    scrolledRemotely = true;
+}
 - (void)layoutSubviews
 {
+    if(!scrolledRemotely){
+        trueContentOffsetX   = self.contentOffset.x;
+        pairedScrollView.contentOffset = CGPointMake(pairedScrollView.contentOffset.x + (trueContentOffsetX - oldTrueContentOffsetX)*RATIO_WITH_PADDING, 0.0f);
+        [pairedScrollView setScrolledRemotely];
+        oldTrueContentOffsetX = trueContentOffsetX ;
+    }
+    
     [super layoutSubviews];
     [self recenterIfNecessary];
     [self tileWallpaperViewsFromMinX:0 toMaxX:self.contentSize.width];
+     scrolledRemotely = false;
     
-    CGFloat offsetX   = self.contentOffset.x;
-    //pairedScrollView.contentOffset = CGPointMake(pairedScrollView.contentOffset.x + (offsetX - oldContentOffset)*RATIO_WITH_PADDING, 0.0f);//RATIO_WITH_PADDING, 0.0f);
-    oldContentOffset = offsetX;
+   
     
 }
 
@@ -144,7 +157,6 @@
 {
     UIImageView *wallpaperImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, WALLPAPER_WIDTH, WALLPAPER_HEIGHT)];
     [wallpaperImageView setImage:[[wallpaperItems objectAtIndex:wallpaperRightIndex]getWallpaper]];
-    
     
     
     [visibleWallpapers addObject:wallpaperImageView]; // add rightmost label at the end of the array

@@ -7,16 +7,19 @@
 //
 
 #import <UIKit/UIKit.h>
+@class InfiniteScrollView;
 
 @interface InfiniteThumbnailScrollView : UIScrollView <UIScrollViewDelegate>{
     NSMutableArray *visibleThumbnails;
     NSMutableArray *wallpaperItems;
     int thumbnailRightIndex;
     int thumbnailLeftIndex;
-    UIScrollView *pairedScrollView;
+    InfiniteScrollView *pairedScrollView;
     float oldTrueContentOffsetX;
     float trueContentOffsetX;
+    bool scrolledRemotely;
 }
 - (id)initWithWallpaperItems:(NSMutableArray*)items;
-- (void)setPairedScrollView: (UIScrollView *)scrollView;
+- (void)setPairedScrollView: (InfiniteScrollView *)scrollView;
+- (void)setScrolledRemotely;
 @end

@@ -15,6 +15,7 @@
 
 
 #import "InfiniteThumbnailScrollView.h"
+#import "InfiniteScrollView.h"
 #import "WallpaperItem.h"
 
 @interface InfiniteThumbnailScrollView ()
@@ -41,11 +42,13 @@
         [self setShowsHorizontalScrollIndicator:NO];
         [self setPagingEnabled: NO];
         [self setIndicatorStyle:UIScrollViewIndicatorStyleWhite];
+        [self setDelegate:self];
     }
     return self;
 }
 
--(void)setPairedScrollView: (UIScrollView *)scrollView{
+
+-(void)setPairedScrollView: (InfiniteScrollView *)scrollView{
     pairedScrollView = scrollView;
 }
 
@@ -69,20 +72,32 @@
     }
     
 }
+
+
+- (void)setScrolledRemotely{
+    scrolledRemotely = true;
+
+}
+
+
 - (void)layoutSubviews
 {
-    trueContentOffsetX   = self.contentOffset.x;
-    pairedScrollView.contentOffset = CGPointMake(pairedScrollView.contentOffset.x + (trueContentOffsetX - oldTrueContentOffsetX)/RATIO_WITH_PADDING, 0.0f);
-    oldTrueContentOffsetX = trueContentOffsetX ;
-    
+    if(!scrolledRemotely){
+   
+        trueContentOffsetX   = self.contentOffset.x;
+        //pairedScrollView.contentOffset = CGPointMake(pairedScrollView.contentOffset.x + (trueContentOffsetX - oldTrueContentOffsetX)/RATIO_WITH_PADDING, 0.0f);
+        CGRect pairedScrollViewBounds = pairedScrollView.bounds;
+        pairedScrollViewBounds.origin =CGPointMake(pairedScrollView.contentOffset.x + (trueContentOffsetX - oldTrueContentOffsetX)/RATIO_WITH_PADDING, 0.0f);
+        [pairedScrollView setscrolledRemotely];
+        pairedScrollView.bounds = pairedScrollViewBounds;
+        oldTrueContentOffsetX = trueContentOffsetX ;
+    }
     [super layoutSubviews];
     [self recenterIfNecessary];
     [self tileThumbnailViewsFromMinX:0 toMaxX:self.contentSize.width];
     NSLog(@"going to scroll: %f", (trueContentOffsetX - oldTrueContentOffsetX)/RATIO_WITH_PADDING);
-
-    
-    
-    
+    scrolledRemotely = false;
+   
 }
 
 
