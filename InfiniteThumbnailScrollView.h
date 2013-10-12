@@ -15,11 +15,14 @@
     int thumbnailRightIndex;
     int thumbnailLeftIndex;
     InfiniteScrollView *pairedScrollView;
-    float oldTrueContentOffsetX;
+    int numResets;
     float trueContentOffsetX;
+    float contentOffsetBeforeSwitch;
     bool scrolledRemotely;
+    bool hasAligned;
 }
 - (id)initWithWallpaperItems:(NSMutableArray*)items;
 - (void)setPairedScrollView: (InfiniteScrollView *)scrollView;
 - (void)setScrolledRemotely;
+-(void)setContentOffsetBeforeSwitch;
 @end

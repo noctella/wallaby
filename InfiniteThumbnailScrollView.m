@@ -4,9 +4,10 @@
 #define WALLPAPER_SCALE 0.77
 #define WALLPAPER_WIDTH 250.0
 #define WALLPAPER_HEIGHT (DISPLAY_HEIGHT*WALLPAPER_SCALE)
-#define WALLPAPER_PADDING 4.0
+#define WALLPAPER_PADDING 2.0
 #define STATUS_HEIGHT 23
 #define RATIO 2.419
+#define TEST_RATIO 10
 #define RATIO_WITH_PADDING ((WALLPAPER_WIDTH + WALLPAPER_PADDING) / (THUMBNAIL_SIZE + WALLPAPER_PADDING))
 
 #define THUMBNAIL_SIZE (WALLPAPER_WIDTH/RATIO)
@@ -29,12 +30,17 @@
 {
     if ((self = [super init]))
     {
-        self.contentSize = CGSizeMake(BUFFER_SIZE * (WALLPAPER_WIDTH + WALLPAPER_PADDING), THUMBNAIL_SIZE);
+        self.contentSize = CGSizeMake((BUFFER_SIZE * (WALLPAPER_WIDTH + WALLPAPER_PADDING)), THUMBNAIL_SIZE);
         self.frame = CGRectMake(0,STATUS_HEIGHT + WALLPAPER_PADDING + WALLPAPER_HEIGHT,325,THUMBNAIL_SIZE);
         wallpaperItems = items;
         thumbnailRightIndex = 0;
         thumbnailLeftIndex = [wallpaperItems count]-1;
-        oldTrueContentOffsetX=0;
+        scrolledRemotely = true;
+        hasAligned = false;
+        numResets = 0;
+        trueContentOffsetX = 0;
+        contentOffsetBeforeSwitch = 0;
+        //self.contentOffset =CGPointMake( 100, 0.0); //CGPointMake(self.contentSize.width/2.0 - (self.contentSize.width/(2.0 *RATIO_WITH_PADDING)), 0.0);
         
         visibleThumbnails = [[NSMutableArray alloc] init];
         
@@ -42,7 +48,6 @@
         [self setShowsHorizontalScrollIndicator:NO];
         [self setPagingEnabled: NO];
         [self setIndicatorStyle:UIScrollViewIndicatorStyleWhite];
-        [self setDelegate:self];
     }
     return self;
 }
@@ -52,50 +57,72 @@
     pairedScrollView = scrollView;
 }
 
+-(void)setContentOffsetBeforeSwitch{
+    contentOffsetBeforeSwitch /= RATIO_WITH_PADDING;
+}
+
 #pragma mark - Layout
 
 - (void) recenterIfNecessary{
-    CGPoint currentOffset = [self contentOffset];
-    CGFloat contentWidth = [self contentSize].width;
-    CGFloat centerOffsetX = (contentWidth - [self bounds].size.width) / 2.0;
-    CGFloat distanceFromCenter = fabs(currentOffset.x - centerOffsetX);
+        CGPoint currentOffset = [self contentOffset];
+        CGFloat contentWidth = [self contentSize].width;
+        CGFloat centerOffsetX = (contentWidth - [self bounds].size.width) / 2.0;
+        CGFloat distanceFromCenter = fabs(currentOffset.x - centerOffsetX);
     
-    if (distanceFromCenter > (contentWidth / 4.0))
-    {
-        self.contentOffset = CGPointMake(centerOffsetX, currentOffset.y);
-        oldTrueContentOffsetX = self.contentOffset.x;
-        
-        // move content by the same amount so it appears to stay still
-        for (UIImageView *imageView in visibleThumbnails) {
-            [imageView setFrame:CGRectMake(imageView.frame.origin.x + (centerOffsetX - currentOffset.x), imageView.frame.origin.y, imageView.frame.size.width, imageView.frame.size.height)];
+
+        if (distanceFromCenter > (contentWidth / 4.0))
+        {
+            NSLog(@"offset of little before resetting: %f", self.contentOffset.x);
+            
+            self.contentOffset = CGPointMake(centerOffsetX, currentOffset.y);
+            
+
+            // move content by the same amount so it appears to stay still
+            for (UIImageView *imageView in visibleThumbnails) {
+                [imageView setFrame:CGRectMake(imageView.frame.origin.x + (centerOffsetX - currentOffset.x), imageView.frame.origin.y, imageView.frame.size.width, imageView.frame.size.height)];
+            }
+            
+            CGPoint bigCurrentOffset = pairedScrollView.contentOffset;
+            CGFloat bigContentWidth = [pairedScrollView contentSize].width;
+            CGFloat bigCenterOffsetX = (bigContentWidth - [pairedScrollView bounds].size.width) / 2.0;
+            pairedScrollView.contentOffset = CGPointMake(bigCenterOffsetX, bigCurrentOffset.y);
+            
+            NSMutableArray *visibleWallpapers = [pairedScrollView getVisibleWallpapers];
+            // move content by the same amount so it appears to stay still
+            for (UIImageView *imageView in visibleWallpapers) {
+                [imageView setFrame:CGRectMake(imageView.frame.origin.x + (bigCenterOffsetX - bigCurrentOffset.x), imageView.frame.origin.y, imageView.frame.size.width, imageView.frame.size.height)];
+            }
         }
-    }
+        //NSLog(@"true content offset x: %f, content offset before switch:%f", trueContentOffsetX, contentOffsetBeforeSwitch);
+
+        trueContentOffsetX = currentOffset.x + contentOffsetBeforeSwitch;
+        
+    
+/*else{
+        self.contentOffset =CGPointMake( 106.0, 0.0); //CGPointMake(self.contentSize.width/2.0 - (self.contentSize.width/(2.0 *RATIO_WITH_PADDING)), 0.0);
+        trueContentOffsetX=self.contentOffset.x;
+        hasAligned=true;
+    }*/
     
 }
 
 
 - (void)setScrolledRemotely{
     scrolledRemotely = true;
-
 }
-
 
 - (void)layoutSubviews
 {
-    if(!scrolledRemotely){
-   
-        trueContentOffsetX   = self.contentOffset.x;
-        //pairedScrollView.contentOffset = CGPointMake(pairedScrollView.contentOffset.x + (trueContentOffsetX - oldTrueContentOffsetX)/RATIO_WITH_PADDING, 0.0f);
-        CGRect pairedScrollViewBounds = pairedScrollView.bounds;
-        pairedScrollViewBounds.origin =CGPointMake(pairedScrollView.contentOffset.x + (trueContentOffsetX - oldTrueContentOffsetX)/RATIO_WITH_PADDING, 0.0f);
-        [pairedScrollView setscrolledRemotely];
-        pairedScrollView.bounds = pairedScrollViewBounds;
-        oldTrueContentOffsetX = trueContentOffsetX ;
-    }
+  
+    
     [super layoutSubviews];
     [self recenterIfNecessary];
     [self tileThumbnailViewsFromMinX:0 toMaxX:self.contentSize.width];
-    NSLog(@"going to scroll: %f", (trueContentOffsetX - oldTrueContentOffsetX)/RATIO_WITH_PADDING);
+    if(!scrolledRemotely){
+        [pairedScrollView setContentOffset:CGPointMake(self.contentOffset.x*RATIO_WITH_PADDING, 0.0f)];
+
+        [pairedScrollView setscrolledRemotely];
+    }
     scrolledRemotely = false;
    
 }
@@ -143,7 +170,7 @@
     // to kick off the tiling we need to make sure there's at least one label
     if ([visibleThumbnails count] == 0)
     {
-        [self placeNewThumbnailImageViewOnRight:minimumVisibleX];
+        [self placeNewThumbnailImageViewOnRight:minimumVisibleX + WALLPAPER_PADDING];
     }
     
     // add labels that are missing on right side
@@ -151,7 +178,7 @@
     CGFloat rightEdge = CGRectGetMaxX([lastthumbnailImageView frame]);  //here's where we'll change the positioning
     while (rightEdge < maximumVisibleX)
     {
-        rightEdge = [self placeNewThumbnailImageViewOnRight:rightEdge];
+        rightEdge = [self placeNewThumbnailImageViewOnRight:rightEdge + WALLPAPER_PADDING];
     }
     
     // add labels that are missing on left side
@@ -159,7 +186,7 @@
     CGFloat leftEdge = CGRectGetMinX([firstthumbnailImageView frame]);
     while (leftEdge > minimumVisibleX)
     {
-        leftEdge = [self placeNewThumbnailImageViewOnLeft:leftEdge];
+        leftEdge = [self placeNewThumbnailImageViewOnLeft:leftEdge - WALLPAPER_PADDING];
     }
     
     // remove labels that have fallen off right edge

@@ -61,4 +61,5 @@
 - (id)initWithWallpaperItems:(NSMutableArray*)items;
 - (void)setPairedScrollView: (InfiniteThumbnailScrollView *)scrollView;
 - (void)setscrolledRemotely;
+-(NSMutableArray *)getVisibleWallpapers;
 @end
