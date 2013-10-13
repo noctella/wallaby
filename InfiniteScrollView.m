@@ -52,14 +52,13 @@
 #define WALLPAPER_HEIGHT (DISPLAY_HEIGHT*WALLPAPER_SCALE)
 #define WALLPAPER_PADDING 2.0
 #define STATUS_HEIGHT 23
-#define RATIO 2 //2.419
-#define RATIO_WITH_PADDING 2
-//((WALLPAPER_WIDTH + WALLPAPER_PADDING) / (THUMBNAIL_SIZE + WALLPAPER_PADDING))
+#define RATIO 2.419
+#define TEST_RATIO 10
+#define RATIO_WITH_PADDING ((WALLPAPER_WIDTH + WALLPAPER_PADDING) / (THUMBNAIL_SIZE + WALLPAPER_PADDING))
 
 #define THUMBNAIL_SIZE (WALLPAPER_WIDTH/RATIO)
 
 #define BUFFER_SIZE 5
-
 
 #import "InfiniteScrollView.h"
 #import "InfiniteThumbnailScrollView.h"
@@ -91,6 +90,7 @@
         [self setShowsHorizontalScrollIndicator:NO];
         [self setPagingEnabled: NO];
         [self setIndicatorStyle:UIScrollViewIndicatorStyleWhite];
+        [self recenterIfNecessary];
         //[self tileWallpaperViewsFromMinX:0 toMaxX:self.contentSize.width];
     }
     return self;
@@ -113,10 +113,7 @@
     CGFloat contentWidth = [self contentSize].width;
     CGFloat centerOffsetX = (contentWidth - [self bounds].size.width) / 2.0;
     CGFloat distanceFromCenter = fabs(currentOffset.x - centerOffsetX);
-    
-    if(currentOffset.x > 1741.0)
-    //if (distanceFromCenter > (contentWidth / (RATIO_WITH_PADDING * 2)))
-    {
+ 
         NSLog(@"laying out Big again. current offset: %f", self.contentOffset.x);
     
         float prevContentOffsetX = self.contentOffset.x;
@@ -133,7 +130,7 @@
         for (UIImageView *imageView in visibleWallpapers) {
             [imageView setFrame:CGRectMake(imageView.frame.origin.x + (centerOffsetX - currentOffset.x), imageView.frame.origin.y, imageView.frame.size.width, imageView.frame.size.height)];
         }
-    }
+    
     
 }
 
@@ -141,7 +138,7 @@
     return visibleWallpapers;
 }
 
--(void) setscrolledRemotely{
+-(void) setScrolledRemotely{
     scrolledRemotely = true;
 }
 - (void)layoutSubviews
@@ -149,15 +146,15 @@
     [super layoutSubviews];
    // [self recenterIfNecessary];
     if(!scrolledRemotely){
-        trueContentOffsetX   = self.contentOffset.x;
-        NSLog(@"other: %f", (trueContentOffsetX - oldTrueContentOffsetX));
-        NSLog(@"other/ratio:%f", (trueContentOffsetX - oldTrueContentOffsetX)/RATIO_WITH_PADDING);
-        NSLog(@"before moving: %f", pairedScrollView.contentOffset.x);
+        NSLog(@"In big, content offset is: %f", self.contentOffset.x);
+
+        [pairedScrollView recenterIfNecessary];
+
+        NSLog(@"setting little in big to: %f", self.contentOffset.x/RATIO_WITH_PADDING);
+
+        [pairedScrollView setContentOffset:CGPointMake(self.contentOffset.x/RATIO_WITH_PADDING, 0.0f)];
         
-        pairedScrollView.contentOffset = CGPointMake(pairedScrollView.contentOffset.x + (trueContentOffsetX - oldTrueContentOffsetX)/RATIO_WITH_PADDING, 0.0f);
-        NSLog(@"after moving: %f", pairedScrollView.contentOffset.x);
         [pairedScrollView setScrolledRemotely];
-        oldTrueContentOffsetX = trueContentOffsetX ;
     }
     
     [self tileWallpaperViewsFromMinX:0 toMaxX:self.contentSize.width];

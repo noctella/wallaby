@@ -85,13 +85,20 @@
             CGPoint bigCurrentOffset = pairedScrollView.contentOffset;
             CGFloat bigContentWidth = [pairedScrollView contentSize].width;
             CGFloat bigCenterOffsetX = (bigContentWidth - [pairedScrollView bounds].size.width) / 2.0;
-            pairedScrollView.contentOffset = CGPointMake(bigCenterOffsetX, bigCurrentOffset.y);
+            float prevOffset = pairedScrollView.contentOffset.x;
+            //pairedScrollView.contentOffset = CGPointMake(bigCenterOffsetX, bigCurrentOffset.y);
+            pairedScrollView.contentOffset = CGPointMake(self.contentOffset.x * RATIO_WITH_PADDING, bigCurrentOffset.y);
+            
             
             NSMutableArray *visibleWallpapers = [pairedScrollView getVisibleWallpapers];
             // move content by the same amount so it appears to stay still
             for (UIImageView *imageView in visibleWallpapers) {
-                [imageView setFrame:CGRectMake(imageView.frame.origin.x + (bigCenterOffsetX - bigCurrentOffset.x), imageView.frame.origin.y, imageView.frame.size.width, imageView.frame.size.height)];
+                [imageView setFrame:CGRectMake(imageView.frame.origin.x + (pairedScrollView.contentOffset.x - bigCurrentOffset.x), imageView.frame.origin.y, imageView.frame.size.width, imageView.frame.size.height)];
             }
+            NSLog(@"little is reset to: %f", self.contentOffset.x);
+            NSLog(@"big is reset to: %f", pairedScrollView.contentOffset.x);
+
+
         }
         //NSLog(@"true content offset x: %f, content offset before switch:%f", trueContentOffsetX, contentOffsetBeforeSwitch);
 
@@ -121,7 +128,7 @@
     if(!scrolledRemotely){
         [pairedScrollView setContentOffset:CGPointMake(self.contentOffset.x*RATIO_WITH_PADDING, 0.0f)];
 
-        [pairedScrollView setscrolledRemotely];
+        [pairedScrollView setScrolledRemotely];
     }
     scrolledRemotely = false;
    

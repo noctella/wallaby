@@ -25,4 +25,5 @@
 - (void)setPairedScrollView: (InfiniteScrollView *)scrollView;
 - (void)setScrolledRemotely;
 -(void)setContentOffsetBeforeSwitch;
+-(void)recenterIfNecessary;
 @end
