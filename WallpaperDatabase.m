@@ -64,7 +64,7 @@
         if ([file.pathExtension compare:@"wallpaperImage" options:NSCaseInsensitiveSearch] == NSOrderedSame) {
             NSString *fullFolderPath = [documentsDirectory stringByAppendingPathComponent:file];
             WallpaperItem *wallpaperView = [[WallpaperItem alloc]initWithFolderPath: fullFolderPath];
-            [wallpaperView setIndex:file ];
+            [wallpaperView setIndex:i ];
             i++;
             [wallpapers addObject:wallpaperView];
         

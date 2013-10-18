@@ -47,6 +47,7 @@
 
 #import <UIKit/UIKit.h>
 @class InfiniteThumbnailScrollView;
+@class WallpaperItem;
 
 @interface InfiniteScrollView : UIScrollView <UIScrollViewDelegate>{
     NSMutableArray *visibleWallpapers;
@@ -62,4 +63,7 @@
 - (void)setPairedScrollView: (InfiniteThumbnailScrollView *)scrollView;
 - (void)setScrolledRemotely;
 -(NSMutableArray *)getVisibleWallpapers;
+-(void)removeWallpaperItem: (WallpaperItem *)wallpaperItem;
+
+@property NSMutableArray *availableWallpaperItems;
 @end

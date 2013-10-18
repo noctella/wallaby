@@ -7,7 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+
 @class InfiniteScrollView;
+@class WallpaperItem;
 
 @interface InfiniteThumbnailScrollView : UIScrollView <UIScrollViewDelegate>{
     NSMutableArray *visibleThumbnails;
@@ -15,15 +17,16 @@
     int thumbnailRightIndex;
     int thumbnailLeftIndex;
     InfiniteScrollView *pairedScrollView;
-    int numResets;
-    float trueContentOffsetX;
-    float contentOffsetBeforeSwitch;
     bool scrolledRemotely;
-    bool hasAligned;
+    bool isEditing;
 }
 - (id)initWithWallpaperItems:(NSMutableArray*)items;
 - (void)setPairedScrollView: (InfiniteScrollView *)scrollView;
 - (void)setScrolledRemotely;
 -(void)setContentOffsetBeforeSwitch;
 -(void)recenterIfNecessary;
+-(IBAction)didLongPressThumbnail:(UILongPressGestureRecognizer*) sender;
+-(void)removeWallpaperItem: (WallpaperItem *)wallpaperItem;
+
+@property NSMutableArray *availableWallpaperItems;
 @end

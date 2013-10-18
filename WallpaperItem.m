@@ -13,8 +13,24 @@
 #define THUMBNAIL_IMAGE_FILE @"thumbnail.png"
 
 @implementation WallpaperItem
+@synthesize wallpaper, thumbnail, background, docPath, isEditing, isLinked, index, thumbnailView, wallpaperView;
 
+-(id)copyWithZone:(NSZone *)zone
+{
+    WallpaperItem *wallpaperItem = [[WallpaperItem alloc]init];
+    
+    wallpaperItem.wallpaper = [UIImage imageWithCGImage:wallpaper.CGImage];
+    wallpaperItem.thumbnail = [UIImage imageWithCGImage:thumbnail.CGImage];
+    wallpaperItem.docPath = [docPath copy];
+    wallpaperItem.thumbnailView = [[UIImageView alloc]initWithImage:wallpaperItem.thumbnail];
+    NSLog(@"created thumbnail view: %@", wallpaperItem.thumbnailView);
 
+    wallpaperItem.wallpaperView = [[UIImageView alloc]initWithImage:wallpaperItem.wallpaper];
+    wallpaperItem.isEditing = isEditing;
+    wallpaperItem.isLinked = false;
+    wallpaperItem.index = index;
+    return wallpaperItem;
+}
 
 -(id)initWithWallpaper: (UIImage *)wallpaperImage andBackground: (UIImage *) backgroundImage andThumbnail: (UIImage *)thumbnailImage{
     self = [super init];
@@ -22,6 +38,8 @@
         wallpaper = wallpaperImage;
         background = backgroundImage;
         thumbnail = thumbnailImage;
+        isEditing = false;
+        isLinked = false;
         
         [self createDataPath];
         [self saveWallpaper];
@@ -39,13 +57,6 @@
     
 }
 
--(void)setIndex: (NSString *) i{
-    index = i;
-}
-
--(int)getIndex{
-    return index;
-}
 
 -(void)loadData{
     NSLog(@"loading data");
@@ -64,10 +75,16 @@
     self = [super init];
     if(self){
          docPath = path;
+        
+        NSLog(@"made is editing:");
+
+        isEditing = false;
+        isLinked = false;
 
         thumbnail = [self getThumbnail];
         
         thumbnailView = [[UIImageView alloc]init];
+        NSLog(@"created thumbnail view: %@", thumbnailView);
         [thumbnailView setImage:thumbnail];
         thumbnailView.userInteractionEnabled = YES;
         
@@ -80,22 +97,13 @@
     return self;
 }
 
--(UIImageView*)getThumbnailView{
-    return thumbnailView;
-}
-
 - (void) setThumbnailViewFrame: (CGRect) frame{
     thumbnailView.frame = frame;
-}
-
--(UIImageView*)getWallpaperView{
-    return wallpaperView;
 }
 
 - (void) setWallpaperViewFrame: (CGRect) frame{
     wallpaperView.frame = frame;
 }
-
 
 -(UIImage *)getWallpaper{
     if(wallpaper != nil) return wallpaper;
@@ -103,11 +111,6 @@
     return [UIImage imageWithContentsOfFile:wallpaperPath];
 }
 
--(void) setWallpaper: (UIImage *) image{
-    wallpaper = image;
-    [wallpaperView setImage:wallpaper];
-    [self saveWallpaper];
-}
 
 -(UIImage *)getThumbnail{
     if(thumbnail != nil) return thumbnail;
@@ -141,14 +144,12 @@
     NSString *wallpaperPath = [docPath stringByAppendingPathComponent:WALLPAPER_IMAGE_FILE];
     NSData *wallpaperImageData = UIImagePNGRepresentation(wallpaper);
     [wallpaperImageData writeToFile:wallpaperPath atomically:YES];
-    NSLog(@"%@", wallpaperPath);
 }
 
 -(void) saveBackground {
     NSString *backgroundPath = [docPath stringByAppendingPathComponent:BACKGROUND_IMAGE_FILE];
     NSData *backgroundImageData = UIImagePNGRepresentation(background);
     [backgroundImageData writeToFile:backgroundPath atomically:YES];
-    NSLog(@"%@", backgroundPath);
 }
 
 -(void) saveThumbnail {
@@ -164,7 +165,6 @@
     NSString *wallpaperPath = [docPath stringByAppendingPathComponent:WALLPAPER_IMAGE_FILE];
     NSData *wallpaperImageData = UIImagePNGRepresentation(wallpaper);
     [wallpaperImageData writeToFile:wallpaperPath atomically:YES];
-    NSLog(@"%@", wallpaperPath);
 
     NSString *thumbnailPath = [docPath stringByAppendingPathComponent:THUMBNAIL_IMAGE_FILE];
     NSData *thumbnailImageData = UIImagePNGRepresentation(thumbnail);

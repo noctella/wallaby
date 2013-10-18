@@ -58,12 +58,13 @@
 
 #define THUMBNAIL_SIZE (WALLPAPER_WIDTH/RATIO)
 
-#define BUFFER_SIZE 5
+#define BUFFER_SIZE 10
 #define FRONT_BUFFER 107
 
 #import "InfiniteScrollView.h"
 #import "InfiniteThumbnailScrollView.h"
 #import "WallpaperItem.h"
+#import "objc/runtime.h"
 
 @interface InfiniteScrollView ()
 
@@ -71,17 +72,18 @@
 
 
 @implementation InfiniteScrollView
+@synthesize availableWallpaperItems;
 
 - (id)initWithWallpaperItems:(NSMutableArray*)items;
 {
     if ((self = [super init]))
     {
-        self.contentSize = 	CGSizeMake(RATIO_WITH_PADDING* BUFFER_SIZE * (WALLPAPER_WIDTH + WALLPAPER_PADDING), WALLPAPER_HEIGHT);
+        self.contentSize = 	CGSizeMake(BUFFER_SIZE * (WALLPAPER_WIDTH + WALLPAPER_PADDING), WALLPAPER_HEIGHT);
         self.frame = CGRectMake(0,STATUS_HEIGHT,DISPLAY_WIDTH,WALLPAPER_HEIGHT);
 
         wallpaperItems = items;
-        wallpaperRightIndex = 4;
-        wallpaperLeftIndex = 3;
+        wallpaperRightIndex = [wallpaperItems count]/2;
+        wallpaperLeftIndex = wallpaperRightIndex - 1;
         scrolledRemotely = true;
         
         visibleWallpapers = [[NSMutableArray alloc] init];
@@ -113,8 +115,11 @@
     CGFloat centerOffsetX = (contentWidth - [self bounds].size.width) / 2.0;
     self.contentOffset = CGPointMake(centerOffsetX, currentOffset.y);
     // move content by the same amount so it appears to stay still
-    for (UIImageView *imageView in visibleWallpapers) {
-        [imageView setFrame:CGRectMake(imageView.frame.origin.x + (centerOffsetX - currentOffset.x), imageView.frame.origin.y, imageView.frame.size.width, imageView.frame.size.height)];
+    for (WallpaperItem *wallpaperItem in visibleWallpapers) {
+        NSLog(@"uh what recentering");
+
+        UIImageView *imageView = [wallpaperItem wallpaperView];
+        [[wallpaperItem wallpaperView]  setFrame:CGRectMake(imageView.frame.origin.x + (centerOffsetX - currentOffset.x), imageView.frame.origin.y, imageView.frame.size.width, imageView.frame.size.height)];
     }
     
     
@@ -136,66 +141,99 @@
         [pairedScrollView setContentOffset:CGPointMake(self.contentOffset.x/RATIO_WITH_PADDING, 0.0f)];
         [pairedScrollView setScrolledRemotely];
     }
-    
-    [self tileWallpaperViewsFromMinX:145 toMaxX:self.contentSize.width];
+    //was 145
+    [self tileWallpaperViewsFromMinX:0 toMaxX:self.contentSize.width];
      scrolledRemotely = false;
 }
 
 
-#pragma mark - Label Tiling
+-(void)addTapRecognizerToView:(UIImageView *)imageView withAssociatedObject: (WallpaperItem *) wallpaperItem{
+    [imageView setUserInteractionEnabled:YES];
+    UITapGestureRecognizer *wallpaperTap = [[UITapGestureRecognizer alloc] initWithTarget:self.delegate action:@selector(didTouchWallpaper:)];
+    wallpaperTap.numberOfTouchesRequired = 1;
+    wallpaperTap.numberOfTapsRequired = 1;
+    objc_setAssociatedObject(wallpaperTap, "wallpaperItem", wallpaperItem, OBJC_ASSOCIATION_ASSIGN);
+    [imageView addGestureRecognizer:wallpaperTap];
 
-- (UIImageView *)insertWallpaperView
-{
-    UIImageView *wallpaperImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, WALLPAPER_WIDTH, WALLPAPER_HEIGHT)];
-    [wallpaperImageView setImage:[[wallpaperItems objectAtIndex:0]getWallpaper]];
-    [self addSubview:wallpaperImageView];
-    
-    return wallpaperImageView;
 }
+-(WallpaperItem *)findAvailableWallpaperItem: (NSString *) side{
+   // NSLog(@"side is: %@", side);
+    
+     /*for(WallpaperItem *availableWallpaper in availableWallpaperItems){
+         NSLog(@"in items:%d", [availableWallpaper index]);
+     }*/
+
+
+    if([side isEqualToString: @"left"] == true){
+        for(WallpaperItem *availableWallpaper in availableWallpaperItems){
+            if([availableWallpaper index] == wallpaperLeftIndex && [availableWallpaper isLinked]==false){
+                [availableWallpaper setIsLinked:true];
+                //NSLog(@"got it from the avails left, index:%d",wallpaperLeftIndex);
+                
+                return availableWallpaper;
+            }
+        }
+        //NSLog(@"not in avails..index:%d",wallpaperLeftIndex);
+        
+        return [[wallpaperItems objectAtIndex:wallpaperLeftIndex]copy];
+    }
+    for(int i=[availableWallpaperItems count] -1; i >=0 ; i--){
+        WallpaperItem *availableWallpaper = [availableWallpaperItems objectAtIndex:i];
+        if([availableWallpaper index] == wallpaperRightIndex && [availableWallpaper isLinked]==false){
+            [availableWallpaper setIsLinked:true];
+            //NSLog(@"got it from the avails right,index:%d",wallpaperRightIndex);
+            
+            return availableWallpaper;
+        }
+    }
+    //NSLog(@"not in the avails...index:%d",wallpaperLeftIndex);
+
+    
+    return [[wallpaperItems objectAtIndex:wallpaperRightIndex]copy];
+}
+
+-(void)removeWallpaperItem: (WallpaperItem *)wallpaperItem{
+    [[wallpaperItem thumbnailView] removeFromSuperview];
+    [[wallpaperItem wallpaperView] removeFromSuperview];
+    NSLog(@"removed it wall");
+    
+    
+}
+
+
 
 - (CGFloat)placeNewWallpaperImageViewOnRight:(CGFloat)rightEdge
 {
-    UIImageView *wallpaperImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, WALLPAPER_WIDTH, WALLPAPER_HEIGHT)];
-    [wallpaperImageView setImage:[[wallpaperItems objectAtIndex:wallpaperRightIndex]getWallpaper]];
-    
-    
-    [visibleWallpapers addObject:wallpaperImageView]; // add rightmost label at the end of the array
-
-    NSLog(@"wallpaper right index: %d", wallpaperRightIndex);
-
-    
-    CGRect frame = [wallpaperImageView frame];
-    frame.origin.x = rightEdge;
-    frame.origin.y = [self bounds].size.height - frame.size.height;
-    [wallpaperImageView setFrame:frame];
-    [self addSubview:wallpaperImageView];
+   
+    WallpaperItem *wallpaperItem = [self findAvailableWallpaperItem:@"right"];
+    [wallpaperItem setWallpaperViewFrame:CGRectMake(rightEdge, 0, WALLPAPER_WIDTH, WALLPAPER_HEIGHT)];
+    [self addTapRecognizerToView:[wallpaperItem wallpaperView] withAssociatedObject:wallpaperItem];
+    [visibleWallpapers addObject:wallpaperItem];
+    [self addSubview:[wallpaperItem wallpaperView]];
     wallpaperRightIndex++;
     if(wallpaperRightIndex == [wallpaperItems count])wallpaperRightIndex = 0;
     
-    return CGRectGetMaxX(frame);
+    return CGRectGetMaxX([wallpaperItem wallpaperView].frame);
 }
+
+
 
 - (CGFloat)placeNewWallpaperImageViewOnLeft:(CGFloat)leftEdge
 {
-    UIImageView *wallpaperImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, WALLPAPER_WIDTH, WALLPAPER_HEIGHT)];
-    [wallpaperImageView setImage:[[wallpaperItems objectAtIndex:wallpaperLeftIndex]getWallpaper]];
-    
-    
-    [visibleWallpapers insertObject:wallpaperImageView atIndex:0]; // add leftmost label at the beginning of the array
-    
+    //WallpaperItem *wallpaperItem = [[wallpaperItems objectAtIndex:wallpaperLeftIndex]copy];
+    WallpaperItem *wallpaperItem = [self findAvailableWallpaperItem: @"left"];
+    [wallpaperItem setWallpaperViewFrame:CGRectMake(leftEdge - WALLPAPER_WIDTH, 0, WALLPAPER_WIDTH, WALLPAPER_HEIGHT)];
+    [self addTapRecognizerToView:[wallpaperItem wallpaperView] withAssociatedObject:wallpaperItem];
+    [visibleWallpapers insertObject:wallpaperItem atIndex:0];
+    [self addSubview:[wallpaperItem wallpaperView]];
 
-    NSLog(@"Added on left: %@", [[wallpaperItems objectAtIndex:wallpaperLeftIndex] getIndex]);
+    //NSLog(@"Added on left: %@", [[wallpaperItems objectAtIndex:wallpaperLeftIndex] getIndex]);
+    NSLog(@"wallpaper items cound:%d", [wallpaperItems count]);
 
-    
-    CGRect frame = [wallpaperImageView frame];
-    frame.origin.x = leftEdge - frame.size.width;
-    frame.origin.y = [self bounds].size.height - frame.size.height;
-    [wallpaperImageView setFrame:frame];
-    [self addSubview:wallpaperImageView];
     wallpaperLeftIndex--;
     if(wallpaperLeftIndex == -1)wallpaperLeftIndex = [wallpaperItems count]-1;
     
-    return CGRectGetMinX(frame);
+    return CGRectGetMinX([wallpaperItem wallpaperView].frame);
 }
 
 - (void)tileWallpaperViewsFromMinX:(CGFloat)minimumVisibleX toMaxX:(CGFloat)maximumVisibleX
@@ -208,37 +246,47 @@
     }
     
     // add labels that are missing on right side
-    UIImageView *lastWallpaperImageView = [visibleWallpapers lastObject];
-    CGFloat rightEdge = CGRectGetMaxX([lastWallpaperImageView frame]);  //here's where we'll change the positioning
+    UIImageView *lastWallpaperImageView = [[visibleWallpapers lastObject]wallpaperView];
+    CGFloat rightEdge = CGRectGetMaxX([lastWallpaperImageView frame]);
     while (rightEdge + WALLPAPER_PADDING < maximumVisibleX)
     {
         rightEdge = [self placeNewWallpaperImageViewOnRight:rightEdge + WALLPAPER_PADDING];
     }
-    
+
     // add labels that are missing on left side
-    UIImageView *firstWallpaperImageView = visibleWallpapers[0];
+    UIImageView *firstWallpaperImageView = [visibleWallpapers[0] wallpaperView];
     CGFloat leftEdge = CGRectGetMinX([firstWallpaperImageView frame]);
     while (leftEdge - WALLPAPER_PADDING > minimumVisibleX)
     {
         leftEdge = [self placeNewWallpaperImageViewOnLeft:leftEdge - WALLPAPER_PADDING];
+        
+        NSLog(@"left edge:%f", leftEdge);
+
     }
-    
+
     // remove labels that have fallen off right edge
-    lastWallpaperImageView = [visibleWallpapers lastObject];
+    lastWallpaperImageView = [[visibleWallpapers lastObject]wallpaperView];
     while ([lastWallpaperImageView frame].origin.x > maximumVisibleX)
     {
+        NSLog(@"removing shit");
+
         [lastWallpaperImageView removeFromSuperview];
         [visibleWallpapers removeLastObject];
-        lastWallpaperImageView = [visibleWallpapers lastObject];
+        lastWallpaperImageView = [[visibleWallpapers lastObject] wallpaperView];
     }
     
+    
+    
     // remove labels that have fallen off left edge
-    firstWallpaperImageView = visibleWallpapers[0];
+    firstWallpaperImageView = [visibleWallpapers[0]wallpaperView];
     while (CGRectGetMaxX([firstWallpaperImageView frame]) < minimumVisibleX)
     {
+        NSLog(@"removing shit");
         [firstWallpaperImageView removeFromSuperview];
         [visibleWallpapers removeObjectAtIndex:0];
-        firstWallpaperImageView = visibleWallpapers[0];
+        firstWallpaperImageView = [visibleWallpapers[0] wallpaperView];
     }
+    
+   
 }
 @end

@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		62017E30180E201A00C3A2E5 /* Reveal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 62017E2F180E201A00C3A2E5 /* Reveal.framework */; };
+		62017E32180E20AA00C3A2E5 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 62017E31180E20AA00C3A2E5 /* CFNetwork.framework */; };
+		62017E34180E20B200C3A2E5 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 62017E33180E20B200C3A2E5 /* QuartzCore.framework */; };
 		6260209A17FE4F2800BC80D7 /* InfiniteScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6260209917FE4F2800BC80D7 /* InfiniteScrollView.m */; };
 		6260209E17FE529D00BC80D7 /* ChangeHomescreenController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6260209C17FE529D00BC80D7 /* ChangeHomescreenController.m */; };
 		6260209F17FE529D00BC80D7 /* ChangeHomescreenController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6260209D17FE529D00BC80D7 /* ChangeHomescreenController.xib */; };
@@ -57,6 +60,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		62017E2F180E201A00C3A2E5 /* Reveal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Reveal.framework; sourceTree = "<group>"; };
+		62017E31180E20AA00C3A2E5 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		62017E33180E20B200C3A2E5 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		6260209817FE4F2800BC80D7 /* InfiniteScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InfiniteScrollView.h; sourceTree = "<group>"; };
 		6260209917FE4F2800BC80D7 /* InfiniteScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InfiniteScrollView.m; sourceTree = "<group>"; };
 		6260209B17FE529D00BC80D7 /* ChangeHomescreenController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChangeHomescreenController.h; sourceTree = "<group>"; };
@@ -274,6 +280,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				62017E34180E20B200C3A2E5 /* QuartzCore.framework in Frameworks */,
+				62017E32180E20AA00C3A2E5 /* CFNetwork.framework in Frameworks */,
+				62017E30180E201A00C3A2E5 /* Reveal.framework in Frameworks */,
 				62F2C3FD17FA56DA00C15DA7 /* liblept.a in Frameworks */,
 				62AF525A17FA4FEF003A878A /* AssetsLibrary.framework in Frameworks */,
 				62F2C3FE17FA56DA00C15DA7 /* libtesseract_all.a in Frameworks */,
@@ -536,6 +545,7 @@
 			isa = PBXGroup;
 			children = (
 				62F2C40517FA570E00C15DA7 /* WallpaperDatabase.h */,
+				62017E2F180E201A00C3A2E5 /* Reveal.framework */,
 				62F2C40617FA570E00C15DA7 /* WallpaperDatabase.m */,
 				62F2C40717FA570E00C15DA7 /* WallpaperItem.h */,
 				62F2C40817FA570E00C15DA7 /* WallpaperItem.m */,
@@ -590,6 +600,8 @@
 		C0C9FE1F162374B000741F7F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				62017E33180E20B200C3A2E5 /* QuartzCore.framework */,
+				62017E31180E20AA00C3A2E5 /* CFNetwork.framework */,
 				62AF525917FA4FEF003A878A /* AssetsLibrary.framework */,
 				C0C9FE20162374B000741F7F /* UIKit.framework */,
 				C0C9FE22162374B000741F7F /* Foundation.framework */,
@@ -780,6 +792,10 @@
 			buildSettings = {
 				ARCHS = armv7;
 				CLANG_CXX_LIBRARY = "compiler-default";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/Jillian/Documents/Wallaby,
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TesseractSample/TesseractSample-Prefix.pch";
 				INFOPLIST_FILE = "TesseractSample/TesseractSample-Info.plist";
@@ -788,6 +804,7 @@
 					"\\\"$(SRCROOT)/TesseractSample/tesseract-ios-lib/lib\\\"",
 					"/Users/Jillian/Documents/Wallaby/tesseract-ios-lib/lib",
 				);
+				"OTHER_LDFLAGS[arch=*]" = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -798,6 +815,10 @@
 			buildSettings = {
 				ARCHS = armv7;
 				CLANG_CXX_LIBRARY = "compiler-default";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/Jillian/Documents/Wallaby,
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TesseractSample/TesseractSample-Prefix.pch";
 				INFOPLIST_FILE = "TesseractSample/TesseractSample-Info.plist";

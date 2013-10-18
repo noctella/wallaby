@@ -8,32 +8,32 @@
 
 #import <UIKit/UIKit.h>
 
-@interface WallpaperItem : UIImageView{
-    UIImage *wallpaper;
-    UIImage *background;
-    UIImage *thumbnail;
-    NSString *docPath;
-    UIImageView *thumbnailView;
-    UIImageView *wallpaperView;
-    NSString *index;
-    
+@interface WallpaperItem : NSObject <NSCopying> {
+    int index;
 }
+
+@property UIImage* wallpaper;
+@property UIImage *thumbnail;
+@property UIImage *background;
+@property NSString *docPath;
+@property UIImageView *thumbnailView;
+@property UIImageView *wallpaperView;
+@property bool isEditing;
+@property bool isLinked;
+@property int index;
+
 
 -(id)initWithWallpaper: (UIImage *)wallpaperImage andBackground: (UIImage *) background andThumbnail: (UIImage *)thumbnailImage;
 - (id)initWithFolderPath: (NSString *)path;
 - (UIImage *)getWallpaper;
 - (UIImage *)getThumbnail;
 - (UIImage *)getBackground;
-- (UIImageView*)getThumbnailView;
-- (UIImageView*)getWallpaperView;
-- (void) setWallpaper: (UIImage *) image;
 - (void) saveData;
 - (void) deleteData;
 - (void) setThumbnailViewFrame: (CGRect) frame;
 - (void) setWallpaperViewFrame: (CGRect) frame;
--(void)setIndex: (NSString *) index;
--(NSString *)getIndex;
 -(void) loadData;
+
 
 
 
