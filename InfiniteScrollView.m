@@ -164,29 +164,32 @@
      }*/
 
 
-    if([side isEqualToString: @"left"] == true){
+    if([side isEqualToString: @"right"] == true){
         for(WallpaperItem *availableWallpaper in availableWallpaperItems){
-            if([availableWallpaper index] == wallpaperLeftIndex && [availableWallpaper isLinked]==false){
+            if([availableWallpaper index] == wallpaperRightIndex && ![availableWallpaper isLinked] && ![availableWallpaper isDisposed]){
                 [availableWallpaper setIsLinked:true];
-                //NSLog(@"got it from the avails left, index:%d",wallpaperLeftIndex);
+               // NSLog(@"got it from the avails right, index:%d",wallpaperRightIndex);
+                //   NSLog(@"wallpaper item is: %@", availableWallpaper);
                 
                 return availableWallpaper;
             }
         }
-        //NSLog(@"not in avails..index:%d",wallpaperLeftIndex);
+        NSLog(@"not in avails..index:%d",wallpaperRightIndex);
         
-        return [[wallpaperItems objectAtIndex:wallpaperLeftIndex]copy];
+        return [[wallpaperItems objectAtIndex:wallpaperRightIndex]copy];
     }
     for(int i=[availableWallpaperItems count] -1; i >=0 ; i--){
         WallpaperItem *availableWallpaper = [availableWallpaperItems objectAtIndex:i];
-        if([availableWallpaper index] == wallpaperRightIndex && [availableWallpaper isLinked]==false){
+        if([availableWallpaper index] == wallpaperLeftIndex && ![availableWallpaper isLinked] && ![availableWallpaper isDisposed]){
             [availableWallpaper setIsLinked:true];
-            //NSLog(@"got it from the avails right,index:%d",wallpaperRightIndex);
+           // NSLog(@"got it from the avails left,index:%d",wallpaperLeftIndex);
+           // NSLog(@"wallpaper item is: %@", availableWallpaper);
+
             
             return availableWallpaper;
         }
     }
-    //NSLog(@"not in the avails...index:%d",wallpaperLeftIndex);
+    NSLog(@"not in the avails...index:%d",wallpaperLeftIndex);
 
     
     return [[wallpaperItems objectAtIndex:wallpaperRightIndex]copy];
@@ -228,8 +231,6 @@
     [self addSubview:[wallpaperItem wallpaperView]];
 
     //NSLog(@"Added on left: %@", [[wallpaperItems objectAtIndex:wallpaperLeftIndex] getIndex]);
-    NSLog(@"wallpaper items cound:%d", [wallpaperItems count]);
-
     wallpaperLeftIndex--;
     if(wallpaperLeftIndex == -1)wallpaperLeftIndex = [wallpaperItems count]-1;
     
@@ -259,32 +260,31 @@
     while (leftEdge - WALLPAPER_PADDING > minimumVisibleX)
     {
         leftEdge = [self placeNewWallpaperImageViewOnLeft:leftEdge - WALLPAPER_PADDING];
-        
-        NSLog(@"left edge:%f", leftEdge);
-
     }
 
     // remove labels that have fallen off right edge
-    lastWallpaperImageView = [[visibleWallpapers lastObject]wallpaperView];
+    WallpaperItem *lastWallpaperItem = [visibleWallpapers lastObject];
+    lastWallpaperImageView = [lastWallpaperItem wallpaperView];
     while ([lastWallpaperImageView frame].origin.x > maximumVisibleX)
     {
-        NSLog(@"removing shit");
-
+        [lastWallpaperItem setIsDisposed:true];
         [lastWallpaperImageView removeFromSuperview];
         [visibleWallpapers removeLastObject];
-        lastWallpaperImageView = [[visibleWallpapers lastObject] wallpaperView];
+        [availableWallpaperItems removeObject:lastWallpaperItem];
+        lastWallpaperItem =[visibleWallpapers lastObject];
+        lastWallpaperImageView = [lastWallpaperItem wallpaperView];
     }
-    
-    
-    
+
     // remove labels that have fallen off left edge
-    firstWallpaperImageView = [visibleWallpapers[0]wallpaperView];
+    WallpaperItem *firstWallpaperItem =visibleWallpapers[0];
+    firstWallpaperImageView = [firstWallpaperItem wallpaperView];
     while (CGRectGetMaxX([firstWallpaperImageView frame]) < minimumVisibleX)
     {
-        NSLog(@"removing shit");
         [firstWallpaperImageView removeFromSuperview];
         [visibleWallpapers removeObjectAtIndex:0];
-        firstWallpaperImageView = [visibleWallpapers[0] wallpaperView];
+        [availableWallpaperItems removeObject:firstWallpaperItem];
+        firstWallpaperItem =visibleWallpapers[0];
+        firstWallpaperImageView = [firstWallpaperItem wallpaperView];
     }
     
    

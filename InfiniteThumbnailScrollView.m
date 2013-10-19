@@ -64,23 +64,13 @@
         CGFloat contentWidth = [self contentSize].width;
         CGFloat centerOffsetX = (contentWidth - [self bounds].size.width) / 2.0;
         CGFloat distanceFromCenter = fabs(currentOffset.x - centerOffsetX);
-    NSLog(@"distance from centre:%f", distanceFromCenter);
-    NSLog(@"content width:%f", contentWidth);
-
-    
 
         if (distanceFromCenter > (contentWidth / 4.0)){
-            NSLog(@"distance is greater");
-            NSLog(@"number of items in visible:%d", [visibleThumbnails count]);
-
-
             self.contentOffset = CGPointMake(centerOffsetX, currentOffset.y);
             
             // move content by the same amount so it appears to stay still
             for (WallpaperItem *wallpaperItem in visibleThumbnails) {
                 UIImageView *imageView = [wallpaperItem thumbnailView];
-                NSLog(@"current offset: %f", imageView.frame.origin.x);
-
                 [imageView setFrame:CGRectMake(imageView.frame.origin.x + (centerOffsetX - currentOffset.x), imageView.frame.origin.y, imageView.frame.size.width, imageView.frame.size.height)];
             }
             
@@ -90,8 +80,6 @@
             NSMutableArray *visibleWallpapers = [pairedScrollView getVisibleWallpapers];
             // move content by the same amount so it appears to stay still
             for (WallpaperItem *wallpaperItem in visibleWallpapers) {
-                NSLog(@"reseting shit");
-
                 UIImageView *imageView = [wallpaperItem wallpaperView];
                 [imageView setFrame:CGRectMake(imageView.frame.origin.x + (pairedScrollView.contentOffset.x - bigCurrentOffset.x), imageView.frame.origin.y, imageView.frame.size.width, imageView.frame.size.height)];
             }
@@ -119,7 +107,7 @@
 
 -(IBAction)didLongPressThumbnail:(UILongPressGestureRecognizer*) sender{
     for(WallpaperItem *wallpaperItem in visibleThumbnails){
-        NSLog(@"The value of the bool is %@\n", (wallpaperItem.isEditing ? @"YES" : @"NO"));
+        //NSLog(@"The value of the bool is %@\n", (wallpaperItem.isEditing ? @"YES" : @"NO"));
         if(![wallpaperItem isEditing]){
             UIButton *deleteWallpaperButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
             [deleteWallpaperButton addTarget:self.delegate action:@selector(didTouchDeleteWallpaper:) forControlEvents:UIControlEventTouchDown];
@@ -148,7 +136,8 @@
     WallpaperItem *wallpaperItem = [[wallpaperItems objectAtIndex:thumbnailRightIndex]copy];
     [wallpaperItem setThumbnailViewFrame: CGRectMake(rightEdge, 0, THUMBNAIL_SIZE, THUMBNAIL_SIZE)];
     [self addPressRecognizerToView:[wallpaperItem thumbnailView] withAssociatedObject:wallpaperItem];
-  
+    
+    
     if(isEditing && ![wallpaperItem isEditing]){
         UIButton *deleteWallpaperButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
         [deleteWallpaperButton addTarget:self.delegate action:@selector(didTouchDeleteWallpaper:) forControlEvents:UIControlEventTouchDown];
@@ -158,11 +147,6 @@
         [[wallpaperItem thumbnailView]addSubview:deleteWallpaperButton];
         [wallpaperItem setIsEditing:true];
     }
-    
-    
-    NSLog(@"right inserted: %@", wallpaperItem);
-    
-
 
     [self addSubview:[wallpaperItem thumbnailView]];
     [visibleThumbnails addObject:wallpaperItem];
@@ -188,10 +172,7 @@
         [[wallpaperItem thumbnailView]addSubview:deleteWallpaperButton];
         [wallpaperItem setIsEditing:true];
     }
-    
-    NSLog(@"left inserted: %@", wallpaperItem);
 
-    
     [visibleThumbnails insertObject:wallpaperItem atIndex:0]; // add leftmost label at the beginning of the array
     [availableWallpaperItems insertObject:wallpaperItem atIndex:0];
 
@@ -219,16 +200,11 @@
     // add labels that are missing on right side
     UIImageView *lastthumbnailImageView = [[visibleThumbnails lastObject] thumbnailView];
     CGFloat rightEdge = CGRectGetMaxX([lastthumbnailImageView frame]);  //here's where we'll change the positioning
-    NSLog(@"right edg:%f", rightEdge);
 
     while (rightEdge + WALLPAPER_PADDING < maximumVisibleX)
     {
-        NSLog(@"right edg:%f", rightEdge);
         rightEdge = [self placeNewThumbnailImageViewOnRight:rightEdge + WALLPAPER_PADDING];
     }
-    
-    NSLog(@"number 1: %d", [visibleThumbnails count]);
-
     
     // add labels that are missing on left side
     UIImageView *firstthumbnailImageView = [visibleThumbnails[0] thumbnailView];
@@ -237,28 +213,28 @@
     {
         leftEdge = [self placeNewThumbnailImageViewOnLeft:leftEdge - WALLPAPER_PADDING];
     }
-    NSLog(@"number 2: %d", [visibleThumbnails count]);
-    
+
     // remove labels that have fallen off right edge
-    lastthumbnailImageView = [[visibleThumbnails lastObject] thumbnailView];
+    WallpaperItem *lastWallpaperItem = [visibleThumbnails lastObject];
+    lastthumbnailImageView = [lastWallpaperItem thumbnailView];
     while ([lastthumbnailImageView frame].origin.x > maximumVisibleX)
     {
+        [lastWallpaperItem setIsDisposed:true];
         [lastthumbnailImageView removeFromSuperview];
         [visibleThumbnails removeLastObject];
-        lastthumbnailImageView = [[visibleThumbnails lastObject]thumbnailView];
+        lastWallpaperItem = [visibleThumbnails lastObject];
+        lastthumbnailImageView = [lastWallpaperItem thumbnailView];
     }
-    NSLog(@"number 3: %d", [visibleThumbnails count]);
     // remove labels that have fallen off left edge
-    WallpaperItem *lastWallpaperItem =visibleThumbnails[0];
-    firstthumbnailImageView = [lastWallpaperItem thumbnailView];
+    WallpaperItem *firstWallpaperItem =visibleThumbnails[0];
+    firstthumbnailImageView = [firstWallpaperItem thumbnailView];
     while (CGRectGetMaxX([firstthumbnailImageView frame]) < minimumVisibleX)
     {
-        NSLog(@"removed one...");
-
+        [firstWallpaperItem setIsDisposed:true];
         [firstthumbnailImageView removeFromSuperview];
         [visibleThumbnails removeObjectAtIndex:0];
-        firstthumbnailImageView = [visibleThumbnails[0] thumbnailView];
+        firstWallpaperItem = visibleThumbnails[0];
+        firstthumbnailImageView = [firstWallpaperItem thumbnailView];
     }
-    NSLog(@"number 4: %d", [visibleThumbnails count]);
 }
 @end

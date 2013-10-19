@@ -20,6 +20,7 @@
 @property UIImageView *wallpaperView;
 @property bool isEditing;
 @property bool isLinked;
+@property bool isDisposed;
 @property int index;
 
 

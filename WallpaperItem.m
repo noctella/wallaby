@@ -13,7 +13,7 @@
 #define THUMBNAIL_IMAGE_FILE @"thumbnail.png"
 
 @implementation WallpaperItem
-@synthesize wallpaper, thumbnail, background, docPath, isEditing, isLinked, index, thumbnailView, wallpaperView;
+@synthesize wallpaper, thumbnail, background, docPath, isEditing, isLinked, isDisposed, index, thumbnailView, wallpaperView;
 
 -(id)copyWithZone:(NSZone *)zone
 {
@@ -23,8 +23,6 @@
     wallpaperItem.thumbnail = [UIImage imageWithCGImage:thumbnail.CGImage];
     wallpaperItem.docPath = [docPath copy];
     wallpaperItem.thumbnailView = [[UIImageView alloc]initWithImage:wallpaperItem.thumbnail];
-    NSLog(@"created thumbnail view: %@", wallpaperItem.thumbnailView);
-
     wallpaperItem.wallpaperView = [[UIImageView alloc]initWithImage:wallpaperItem.wallpaper];
     wallpaperItem.isEditing = isEditing;
     wallpaperItem.isLinked = false;
@@ -40,6 +38,7 @@
         thumbnail = thumbnailImage;
         isEditing = false;
         isLinked = false;
+        isDisposed = false;
         
         [self createDataPath];
         [self saveWallpaper];
@@ -76,15 +75,13 @@
     if(self){
          docPath = path;
         
-        NSLog(@"made is editing:");
-
         isEditing = false;
         isLinked = false;
+        isDisposed = false;
 
         thumbnail = [self getThumbnail];
         
         thumbnailView = [[UIImageView alloc]init];
-        NSLog(@"created thumbnail view: %@", thumbnailView);
         [thumbnailView setImage:thumbnail];
         thumbnailView.userInteractionEnabled = YES;
         
