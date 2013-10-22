@@ -55,13 +55,15 @@ static UIImage *mask;
      UIImage *homescreen = [[UIImage alloc] initWithCGImage:image.CGImage scale:DISPLAY_SCALE orientation:UIImageOrientationUp];
     NSLog(@"processing the homescreen, %@", homescreen);
     UIImage *template = [[UIImage alloc] initWithCGImage:[UIImage imageNamed: @"transparentWallpaper.png"].CGImage scale:DISPLAY_SCALE orientation:UIImageOrientationUp];
+    
+      UIImage *formattedHomescreen = [self formatImage:homescreen];
 
     //main icons
     for(int i=0; i<4; i++){
         for(int j=0; j< 5; j++){
             int x = 32 + (152*i);
             int y = 50 + (176*j);
-            UIImage *icon = [self maskAndCropImage:homescreen withX:x withY:y withMask:[self mask]];
+            UIImage *icon = [self maskAndCropImage:formattedHomescreen withX:x withY:y withMask:[self mask]];
             template = [self MergeImage:template withImage:icon atXLoc: x atYLoc: y];
         }
     }
@@ -70,18 +72,19 @@ static UIImage *mask;
     for(int i=0; i< 4; i++){
         int x = 32 + (152*i);
         int y = 972;
-        UIImage *icon = [self maskAndCropImage:homescreen withX:x withY:y withMask:[self mask]];
+        UIImage *icon = [self maskAndCropImage:formattedHomescreen withX:x withY:y withMask:[self mask]];
         template = [self MergeImage:template withImage:icon atXLoc: x atYLoc: y];
     }
     
     Tesseract* tesseract = [[Tesseract alloc] initWithDataPath:@"tessdata" language:@"eng"];
+   
     
     //main labels
     for(int i=0; i<4; i++){
         for(int j=0; j< 5; j++){
             int x = 32 + (152*i);
             int y = 173 + (176*j);
-            UIImage *title = [self cropImage:homescreen toRect:CGRectMake(x, y, 122, 30)]; 
+            UIImage *title = [self cropImage:formattedHomescreen toRect:CGRectMake(x, y, 122, 30)];
             [tesseract setImage:title];
             [tesseract recognize];
             NSString *label = [tesseract recognizedText];
@@ -96,8 +99,7 @@ static UIImage *mask;
     for(int i=0; i< 4; i++){
         int x = 30 + (150*i);
         int y = 1094;
-        UIImage *title = [self cropImage:homescreen toRect:CGRectMake(x, y, 132, 30)];
-        Tesseract* tesseract = [[Tesseract alloc] initWithDataPath:@"tessdata" language:@"eng"];
+        UIImage *title = [self cropImage:formattedHomescreen toRect:CGRectMake(x, y, 132, 30)];
         [tesseract setImage:title];
         [tesseract recognize];
         NSString *label = [tesseract recognizedText];
