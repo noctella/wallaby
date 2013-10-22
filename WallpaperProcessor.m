@@ -135,15 +135,10 @@ static UIImage *mask;
     //Crop image to the max rect it can be
     float height = wallpaper.size.height;
     float width = (SCREEN_WIDTH * height)/SCREEN_HEIGHT;
-    
-    NSLog(@"height: %f, width: %f", height, width);
-    
-    
-    
+
     if(wallpaper.size.width < width){
         width = wallpaper.size.width;
         height = (SCREEN_HEIGHT*width)/SCREEN_HEIGHT;
-        NSLog(@"Width is the limiter. height: %f, width: %f", height, width);
     }
     
     float heightRatio = SCREEN_HEIGHT/height;

@@ -196,18 +196,15 @@
 }
 
 -(void)removeWallpaperItem: (WallpaperItem *)wallpaperItem{
-    [[wallpaperItem thumbnailView] removeFromSuperview];
-    [[wallpaperItem wallpaperView] removeFromSuperview];
-    NSLog(@"removed it wall");
-    
-    
+   
 }
 
 
 
 - (CGFloat)placeNewWallpaperImageViewOnRight:(CGFloat)rightEdge
 {
-   
+    NSLog(@"In big: right index: %d", wallpaperRightIndex);
+
     WallpaperItem *wallpaperItem = [self findAvailableWallpaperItem:@"right"];
     [wallpaperItem setWallpaperViewFrame:CGRectMake(rightEdge, 0, WALLPAPER_WIDTH, WALLPAPER_HEIGHT)];
     [self addTapRecognizerToView:[wallpaperItem wallpaperView] withAssociatedObject:wallpaperItem];
@@ -223,7 +220,7 @@
 
 - (CGFloat)placeNewWallpaperImageViewOnLeft:(CGFloat)leftEdge
 {
-    //WallpaperItem *wallpaperItem = [[wallpaperItems objectAtIndex:wallpaperLeftIndex]copy];
+    NSLog(@"In big: left index: %d", wallpaperLeftIndex);
     WallpaperItem *wallpaperItem = [self findAvailableWallpaperItem: @"left"];
     [wallpaperItem setWallpaperViewFrame:CGRectMake(leftEdge - WALLPAPER_WIDTH, 0, WALLPAPER_WIDTH, WALLPAPER_HEIGHT)];
     [self addTapRecognizerToView:[wallpaperItem wallpaperView] withAssociatedObject:wallpaperItem];

@@ -69,8 +69,6 @@
             }
             UIImageView *overlayView = [[UIImageView alloc] initWithImage:overlayImage];
             [_overlayViewArray addObject:overlayView];
-            NSLog(@"overlayy:%hhd", asset.selected);
-
             overlayView.hidden = asset.selected ? NO : YES;
         }
     }
@@ -90,7 +88,6 @@
             asset.selected = !asset.selected;
             UIImageView *overlayView = [_overlayViewArray objectAtIndex:i];
             overlayView.hidden = !asset.selected;
-            NSLog(@"overlayy2:%hhd", asset.selected);
             break;
         }
         frame.origin.x = frame.origin.x + frame.size.width + 4;

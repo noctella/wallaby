@@ -133,6 +133,7 @@
 
 - (CGFloat)placeNewThumbnailImageViewOnRight:(CGFloat)rightEdge
 {
+     NSLog(@"In little: right index: %d", thumbnailRightIndex);
     WallpaperItem *wallpaperItem = [[wallpaperItems objectAtIndex:thumbnailRightIndex]copy];
     [wallpaperItem setThumbnailViewFrame: CGRectMake(rightEdge, 0, THUMBNAIL_SIZE, THUMBNAIL_SIZE)];
     [self addPressRecognizerToView:[wallpaperItem thumbnailView] withAssociatedObject:wallpaperItem];
@@ -159,6 +160,8 @@
 
 - (CGFloat)placeNewThumbnailImageViewOnLeft:(CGFloat)leftEdge
 {
+    NSLog(@"In little: left index: %d", thumbnailLeftIndex);
+    
      WallpaperItem *wallpaperItem = [[wallpaperItems objectAtIndex:thumbnailLeftIndex]copy];
     [wallpaperItem setThumbnailViewFrame: CGRectMake(leftEdge - THUMBNAIL_SIZE, 0, THUMBNAIL_SIZE, THUMBNAIL_SIZE)];
     [self addPressRecognizerToView:[wallpaperItem thumbnailView] withAssociatedObject: wallpaperItem];
@@ -184,7 +187,56 @@
 }
 
 -(void)removeWallpaperItem: (WallpaperItem *)wallpaperItem{
-    //[visibleThumbnails removeObject: wallpaperItem];
+    [[wallpaperItem thumbnailView] removeFromSuperview];
+    [[wallpaperItem wallpaperView] removeFromSuperview];
+    
+    NSMutableArray *wallpaperDuplicates =[[NSMutableArray alloc]init];
+    
+    int index = 0;
+    for(WallpaperItem *item in visibleThumbnails){
+        if([item index] == [wallpaperItem index]){
+            [wallpaperDuplicates addObject:item];
+        }
+    }
+    
+    for(WallpaperItem *item in wallpaperDuplicates){
+        index = [visibleThumbnails indexOfObject:item];
+        [visibleThumbnails removeObject:item];
+        for(int i=index; i< [visibleThumbnails count]; i++){
+            WallpaperItem *wallpaperItem= [visibleThumbnails objectAtIndex:i];
+            [wallpaperItem setThumbnailViewFrame:CGRectMake([wallpaperItem thumbnailView].frame.origin.x - THUMBNAIL_SIZE - WALLPAPER_PADDING,[wallpaperItem thumbnailView].frame.origin.y,THUMBNAIL_SIZE, THUMBNAIL_SIZE)];
+            
+        }
+        [availableWallpaperItems removeObjectAtIndex:[wallpaperItem index]];
+    }
+    
+    
+
+    index = 0;
+    NSMutableArray *visibleWallpapers = [pairedScrollView getVisibleWallpapers];
+    [wallpaperDuplicates removeAllObjects];
+    
+    for(WallpaperItem *item in visibleWallpapers){
+        if([item index] == [wallpaperItem index]){
+            [wallpaperDuplicates addObject:wallpaperItem];
+            
+        }
+    }
+    
+    
+    for(WallpaperItem *item in wallpaperDuplicates){
+        index = [visibleWallpapers indexOfObject:item];
+        [visibleWallpapers removeObject:wallpaperItem];
+            
+        for(int i=index; i< [visibleWallpapers count]; i++){
+            WallpaperItem *wallpaperItem= [visibleWallpapers objectAtIndex:i];
+            [wallpaperItem setWallpaperViewFrame:CGRectMake([wallpaperItem wallpaperView].frame.origin.x - WALLPAPER_WIDTH - WALLPAPER_PADDING,0,WALLPAPER_WIDTH, WALLPAPER_HEIGHT)];
+            
+        }
+    }
+
+    [wallpaperItem deleteData];
+    [wallpaperItems removeObjectAtIndex:[wallpaperItem index]];
     
 }
 
