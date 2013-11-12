@@ -17,7 +17,9 @@
 #define SCREEN_WIDTH 320
 
 #import "WallpaperProcessor.h"
+#import "WallpaperDatabase.h"
 #import "tesseract.h"
+#import "IconItem.h"
 
 
 @implementation WallpaperProcessor
@@ -47,6 +49,7 @@ static UIImage *mask;
 
 + (void) setTemplate:(UIImage *)screen{
     template = screen;
+    [WallpaperDatabase saveTemplate: template];
 }
 
 + (UIImage *) processHomescreen: (UIImage *) image{
@@ -58,13 +61,30 @@ static UIImage *mask;
     
       UIImage *formattedHomescreen = [self formatImage:homescreen];
 
+      Tesseract* tesseract = [[Tesseract alloc] initWithDataPath:@"tessdata" language:@"eng"];
+    
+    
+    for(IconItem *item in [IconItem items]){
+        if([item isPresent]){
+            UIImage *icon = [self maskAndCropImage:formattedHomescreen withX:[item iconPosition].origin.x withY:[item iconPosition].origin.y withMask:[self mask]];
+            template = [self MergeImage:template withImage:icon atXLoc: [item iconPosition].origin.x atYLoc: [item iconPosition].origin.y];
+            
+            UIImage *title = [self cropImage:formattedHomescreen toRect:CGRectMake([item labelPosition].origin.x, [item labelPosition].origin.y, 122, 30)];
+            [tesseract setImage:title];
+            [tesseract recognize];
+            NSString *label = [tesseract recognizedText];
+            label =  [label
+                      stringByReplacingOccurrencesOfString:@" " withString:@""];
+            template = [self drawText:label inImage:template atPoint:CGPointMake([item labelPosition].origin.x, [item labelPosition].origin.y)];
+        }
+    }
+
     //main icons
-    for(int i=0; i<4; i++){
+    /*for(int i=0; i<4; i++){
         for(int j=0; j< 5; j++){
             int x = 32 + (152*i);
             int y = 50 + (176*j);
-            UIImage *icon = [self maskAndCropImage:formattedHomescreen withX:x withY:y withMask:[self mask]];
-            template = [self MergeImage:template withImage:icon atXLoc: x atYLoc: y];
+            
         }
     }
     
@@ -76,7 +96,7 @@ static UIImage *mask;
         template = [self MergeImage:template withImage:icon atXLoc: x atYLoc: y];
     }
     
-    Tesseract* tesseract = [[Tesseract alloc] initWithDataPath:@"tessdata" language:@"eng"];
+  
    
     
     //main labels
@@ -84,13 +104,7 @@ static UIImage *mask;
         for(int j=0; j< 5; j++){
             int x = 32 + (152*i);
             int y = 173 + (176*j);
-            UIImage *title = [self cropImage:formattedHomescreen toRect:CGRectMake(x, y, 122, 30)];
-            [tesseract setImage:title];
-            [tesseract recognize];
-            NSString *label = [tesseract recognizedText];
-            label =  [label
-                      stringByReplacingOccurrencesOfString:@" " withString:@""];
-            template = [self drawText:label inImage:template atPoint:CGPointMake(x, y)];
+            
 
         }
     }
@@ -107,7 +121,7 @@ static UIImage *mask;
                   stringByReplacingOccurrencesOfString:@" " withString:@""];
         template = [self drawText:label inImage:template atPoint:CGPointMake(x, y)];
  
-    }
+    }*/
     return template;
 }
 

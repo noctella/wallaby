@@ -7,9 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		62017E30180E201A00C3A2E5 /* Reveal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 62017E2F180E201A00C3A2E5 /* Reveal.framework */; };
 		62017E32180E20AA00C3A2E5 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 62017E31180E20AA00C3A2E5 /* CFNetwork.framework */; };
 		62017E34180E20B200C3A2E5 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 62017E33180E20B200C3A2E5 /* QuartzCore.framework */; };
+		620F9E8D1821F4E600CF5862 /* template_grey.png in Resources */ = {isa = PBXBuildFile; fileRef = 620F9E8C1821F4E600CF5862 /* template_grey.png */; };
+		6226242A183075AF00658A19 /* mask_clear@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 62262429183075AF00658A19 /* mask_clear@2x.png */; };
+		625151861829DEC400391474 /* mask_grey@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 625151851829DEC400391474 /* mask_grey@2x.png */; };
+		625151881829E28E00391474 /* Reveal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 625151871829E28E00391474 /* Reveal.framework */; };
+		625AB163181A0ABD00398DA1 /* EditTemplateController.m in Sources */ = {isa = PBXBuildFile; fileRef = 625AB161181A0ABD00398DA1 /* EditTemplateController.m */; };
+		625AB167181DE96600398DA1 /* IconItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 625AB166181DE96600398DA1 /* IconItem.m */; };
 		6260209A17FE4F2800BC80D7 /* InfiniteScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6260209917FE4F2800BC80D7 /* InfiniteScrollView.m */; };
 		6260209E17FE529D00BC80D7 /* ChangeHomescreenController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6260209C17FE529D00BC80D7 /* ChangeHomescreenController.m */; };
 		6260209F17FE529D00BC80D7 /* ChangeHomescreenController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6260209D17FE529D00BC80D7 /* ChangeHomescreenController.xib */; };
@@ -60,9 +65,16 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		62017E2F180E201A00C3A2E5 /* Reveal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Reveal.framework; sourceTree = "<group>"; };
 		62017E31180E20AA00C3A2E5 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		62017E33180E20B200C3A2E5 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		620F9E8C1821F4E600CF5862 /* template_grey.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = template_grey.png; sourceTree = "<group>"; };
+		62262429183075AF00658A19 /* mask_clear@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "mask_clear@2x.png"; sourceTree = "<group>"; };
+		625151851829DEC400391474 /* mask_grey@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "mask_grey@2x.png"; sourceTree = "<group>"; };
+		625151871829E28E00391474 /* Reveal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Reveal.framework; sourceTree = "<group>"; };
+		625AB160181A0ABD00398DA1 /* EditTemplateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditTemplateController.h; sourceTree = "<group>"; };
+		625AB161181A0ABD00398DA1 /* EditTemplateController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EditTemplateController.m; sourceTree = "<group>"; };
+		625AB165181DE96600398DA1 /* IconItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IconItem.h; sourceTree = "<group>"; };
+		625AB166181DE96600398DA1 /* IconItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IconItem.m; sourceTree = "<group>"; };
 		6260209817FE4F2800BC80D7 /* InfiniteScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InfiniteScrollView.h; sourceTree = "<group>"; };
 		6260209917FE4F2800BC80D7 /* InfiniteScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InfiniteScrollView.m; sourceTree = "<group>"; };
 		6260209B17FE529D00BC80D7 /* ChangeHomescreenController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChangeHomescreenController.h; sourceTree = "<group>"; };
@@ -282,8 +294,8 @@
 			files = (
 				62017E34180E20B200C3A2E5 /* QuartzCore.framework in Frameworks */,
 				62017E32180E20AA00C3A2E5 /* CFNetwork.framework in Frameworks */,
-				62017E30180E201A00C3A2E5 /* Reveal.framework in Frameworks */,
 				62F2C3FD17FA56DA00C15DA7 /* liblept.a in Frameworks */,
+				625151881829E28E00391474 /* Reveal.framework in Frameworks */,
 				62AF525A17FA4FEF003A878A /* AssetsLibrary.framework in Frameworks */,
 				62F2C3FE17FA56DA00C15DA7 /* libtesseract_all.a in Frameworks */,
 				C0C9FE21162374B000741F7F /* UIKit.framework in Frameworks */,
@@ -545,11 +557,11 @@
 			isa = PBXGroup;
 			children = (
 				62F2C40517FA570E00C15DA7 /* WallpaperDatabase.h */,
-				62017E2F180E201A00C3A2E5 /* Reveal.framework */,
 				62F2C40617FA570E00C15DA7 /* WallpaperDatabase.m */,
 				62F2C40717FA570E00C15DA7 /* WallpaperItem.h */,
 				62F2C40817FA570E00C15DA7 /* WallpaperItem.m */,
 				62F2C40E17FA570E00C15DA7 /* WWallpaperController.h */,
+				620F9E8C1821F4E600CF5862 /* template_grey.png */,
 				62F2C40917FA570E00C15DA7 /* WallpaperProcessor.h */,
 				62F2C40A17FA570E00C15DA7 /* WallpaperProcessor.m */,
 				62F2C40B17FA570E00C15DA7 /* WallpaperZoomController.h */,
@@ -558,6 +570,11 @@
 				626020A017FE608B00BC80D7 /* transparentWallpaper.png */,
 				6260209B17FE529D00BC80D7 /* ChangeHomescreenController.h */,
 				6260209C17FE529D00BC80D7 /* ChangeHomescreenController.m */,
+				625151871829E28E00391474 /* Reveal.framework */,
+				625AB160181A0ABD00398DA1 /* EditTemplateController.h */,
+				625AB161181A0ABD00398DA1 /* EditTemplateController.m */,
+				625AB165181DE96600398DA1 /* IconItem.h */,
+				625AB166181DE96600398DA1 /* IconItem.m */,
 				6260209D17FE529D00BC80D7 /* ChangeHomescreenController.xib */,
 				62F2C40F17FA570E00C15DA7 /* WWallpaperController.m */,
 				6260209817FE4F2800BC80D7 /* InfiniteScrollView.h */,
@@ -568,6 +585,7 @@
 				62F2C32117FA56D900C15DA7 /* AppDelegate.h */,
 				62F2C32217FA56D900C15DA7 /* AppDelegate.m */,
 				62F2C32317FA56D900C15DA7 /* Default-568h@2x.png */,
+				62262429183075AF00658A19 /* mask_clear@2x.png */,
 				62F2C32417FA56D900C15DA7 /* Default.png */,
 				62F2C32517FA56D900C15DA7 /* Default@2x.png */,
 				62F2C32617FA56D900C15DA7 /* ELCImagePicker */,
@@ -578,6 +596,7 @@
 				62F2C34117FA56D900C15DA7 /* tesseract-ios */,
 				62F2C34717FA56D900C15DA7 /* tesseract-ios-lib */,
 				62F2C3DF17FA56DA00C15DA7 /* TesseractSample-Info.plist */,
+				625151851829DEC400391474 /* mask_grey@2x.png */,
 				62F2C3E017FA56DA00C15DA7 /* TesseractSample-Prefix.pch */,
 				62F2C3E117FA56DA00C15DA7 /* testLarge.png */,
 				62F2C3E217FA56DA00C15DA7 /* testLarge@2x.png */,
@@ -664,6 +683,7 @@
 				62F2C3F817FA56DA00C15DA7 /* mask@2x.png in Resources */,
 				62F2C3F517FA56DA00C15DA7 /* ViewController.xib in Resources */,
 				62F2C40317FA56DA00C15DA7 /* wallpaper1.png in Resources */,
+				625151861829DEC400391474 /* mask_grey@2x.png in Resources */,
 				62F2C3FA17FA56DA00C15DA7 /* LICENSE in Resources */,
 				62F2C40117FA56DA00C15DA7 /* testLarge.png in Resources */,
 				62F2C41517FA570E00C15DA7 /* WallpaperZoomController.xib in Resources */,
@@ -677,12 +697,14 @@
 				62F2C3F717FA56DA00C15DA7 /* mask.png in Resources */,
 				62F2C3E917FA56DA00C15DA7 /* Default@2x.png in Resources */,
 				62F2C40417FA56DA00C15DA7 /* wallpaper2.png in Resources */,
+				620F9E8D1821F4E600CF5862 /* template_grey.png in Resources */,
 				62F2C3E717FA56DA00C15DA7 /* Default-568h@2x.png in Resources */,
 				62F2C3F317FA56DA00C15DA7 /* Overlay@2x.png in Resources */,
 				62F2C40017FA56DA00C15DA7 /* TesseractSample-Info.plist in Resources */,
 				6260209F17FE529D00BC80D7 /* ChangeHomescreenController.xib in Resources */,
 				62F2C3FC17FA56DA00C15DA7 /* .gitignore in Resources */,
 				62F2C3FB17FA56DA00C15DA7 /* README.md in Resources */,
+				6226242A183075AF00658A19 /* mask_clear@2x.png in Resources */,
 				62F2C3E817FA56DA00C15DA7 /* Default.png in Resources */,
 				62F2C3F417FA56DA00C15DA7 /* InfoPlist.strings in Resources */,
 				62F2C3F017FA56DA00C15DA7 /* ELCAssetPicker.xib in Resources */,
@@ -696,6 +718,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				625AB163181A0ABD00398DA1 /* EditTemplateController.m in Sources */,
 				62F2C41617FA570E00C15DA7 /* WWallpaperController.m in Sources */,
 				62F2C3EA17FA56DA00C15DA7 /* ELCAlbumPickerController.m in Sources */,
 				62F2C3EC17FA56DA00C15DA7 /* ELCAssetCell.m in Sources */,
@@ -704,6 +727,7 @@
 				62F2C3EE17FA56DA00C15DA7 /* ELCImagePickerController.m in Sources */,
 				62F2C3EB17FA56DA00C15DA7 /* ELCAsset.m in Sources */,
 				62F2C41117FA570E00C15DA7 /* WallpaperDatabase.m in Sources */,
+				625AB167181DE96600398DA1 /* IconItem.m in Sources */,
 				62F2C41217FA570E00C15DA7 /* WallpaperItem.m in Sources */,
 				62F2C41317FA570E00C15DA7 /* WallpaperProcessor.m in Sources */,
 				62F2C3E617FA56DA00C15DA7 /* AppDelegate.m in Sources */,

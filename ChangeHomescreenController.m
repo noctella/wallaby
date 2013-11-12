@@ -8,6 +8,7 @@
 
 #import "ChangeHomescreenController.h"
 #import "WWallpaperController.h"
+#import "EditTemplateController.h"
 
 @interface ChangeHomescreenController ()
 
@@ -27,7 +28,14 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    [homescreenView setImage:[WallpaperProcessor template]];
     // Do any additional setup after loading the view from its nib.
+}
+
+- (void) viewWillAppear:(BOOL)animated{
+    NSLog(@"view will appear");
+    [super viewWillAppear:animated];
+    [homescreenView setImage:[WallpaperProcessor template]];
 }
 
 - (void)didReceiveMemoryWarning
@@ -37,10 +45,11 @@
 }
 
 - (void) setCurrentHomescreen: (UIImage *)homescreen{
-    [homescreenView setImage: homescreen];
+   // [homescreenView setImage: homescreen];
 }
 
 -(IBAction)close:(id)sender{
+    [WWallpaperController setTemplate:[WallpaperProcessor template]];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -53,11 +62,20 @@
 
 -(void) imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info{
     UIImage *newHomescreen = [info objectForKey: UIImagePickerControllerOriginalImage];
-    [self dismissViewControllerAnimated:YES completion:^(void){
+    EditTemplateController *editTemplateController = [[EditTemplateController alloc]init];
+    
+    //[self presentViewController: editTemplateController animated:NO completion:nil];
+    
+   /* [self dismissViewControllerAnimated:YES completion:^(void){
         
         UIImage *template = [WallpaperProcessor processHomescreen:newHomescreen];
         [homescreenView setImage:template];
         [WWallpaperController setTemplate:template];
+    }]*/
+    
+    [self dismissViewControllerAnimated:YES completion:^(void){
+        [self presentViewController: editTemplateController animated:NO completion:nil];
+         [editTemplateController setCurrentHomescreen:newHomescreen];
     }];
 }
     

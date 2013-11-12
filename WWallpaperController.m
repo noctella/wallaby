@@ -54,6 +54,8 @@ static UIImage *template;
 static NSMutableArray *wallpaperItems;
 static NSMutableArray *visibleWallpapers;
 static NSMutableArray *wallpaperTapGestureRecognizers;
+static InfiniteScrollView *wallpaperScrollView;
+static InfiniteThumbnailScrollView *thumbnailScrollView;
 
 
 
@@ -73,10 +75,12 @@ static NSMutableArray *wallpaperTapGestureRecognizers;
     @synchronized(self){
         template = image;
         [WallpaperProcessor setTemplate:template];
-        [WallpaperDatabase saveTemplate: template];
-        /*for(WallpaperItem *wallpaperItem in wallpaperItems){
-            [wallpaperItem setWallpaper: [WallpaperProcessor process: [wallpaperItem getBackground]]];
-        }*/
+        for(WallpaperItem *wallpaperItem in wallpaperItems){
+            UIImage *wallpaper =[WallpaperProcessor process: [wallpaperItem getBackground]];
+            [[wallpaperItem wallpaperView]setImage:wallpaper];
+            [wallpaperItem setWallpaper: wallpaper];
+        }
+      
     }
 }
 
@@ -177,30 +181,6 @@ static NSMutableArray *wallpaperTapGestureRecognizers;
     
     [wallpaperScrollView setAvailableWallpaperItems:[thumbnailScrollView availableWallpaperItems]];
 
-	/*for (int i = 0; i < [wallpaperItems count]; i++) {
-  
-
-        /*UITapGestureRecognizer *wallpaperTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didTouchWallpaper:)];
-        wallpaperTap.numberOfTouchesRequired = 1;
-        wallpaperTap.numberOfTapsRequired = 1;
-        [visibleWallpaperView addGestureRecognizer:wallpaperTap];
-        [wallpaperTapGestureRecognizers addObject:wallpaperTap];
-        
-        WallpaperItem *wallpaperItem = [wallpaperItems objectAtIndex:i];
-        
-        CGFloat thumbnailXOrigin = ((DISPLAY_WIDTH - THUMBNAIL_SIZE)/2) + (i * (THUMBNAIL_SIZE + WALLPAPER_PADDING));
-        
-        [wallpaperItem setThumbnailViewFrame: CGRectMake(thumbnailXOrigin,0,THUMBNAIL_SIZE, THUMBNAIL_SIZE)];
-        [thumbnailScrollView addSubview:[wallpaperItem getThumbnailView]];
-        
-        UILongPressGestureRecognizer *thumbnailLongPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(didLongPressThumbnail:)];
-        thumbnailLongPress.numberOfTouchesRequired = 1;
-        thumbnailLongPress.minimumPressDuration = 1;
-        objc_setAssociatedObject(thumbnailLongPress, "wallpaperItem", [wallpaperItems objectAtIndex:i], OBJC_ASSOCIATION_ASSIGN);
-        [[wallpaperItem getThumbnailView] addGestureRecognizer:thumbnailLongPress];
-
-	}*/
- 
     addWallpaperButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
     [addWallpaperButton addTarget:self action:@selector(didTouchAddWallpaper:) forControlEvents:UIControlEventTouchDown];
     [addWallpaperButton setTitle:@"+" forState:UIControlStateNormal];
@@ -223,6 +203,39 @@ static NSMutableArray *wallpaperTapGestureRecognizers;
 
 
 -(void) viewDidAppear:(BOOL)animated{
+    
+    [thumbnailScrollView removeFromSuperview];
+    [wallpaperScrollView removeFromSuperview];
+    
+    thumbnailScrollView = [[InfiniteThumbnailScrollView alloc]initWithWallpaperItems:wallpaperItems];
+    wallpaperScrollView = [[InfiniteScrollView alloc]initWithWallpaperItems:wallpaperItems ];
+    
+    [wallpaperScrollView setDelegate:self];
+    
+    [wallpaperScrollView setPairedScrollView: thumbnailScrollView];
+    [thumbnailScrollView setPairedScrollView:wallpaperScrollView];
+    
+    [wallpaperScrollView setAvailableWallpaperItems:[thumbnailScrollView availableWallpaperItems]];
+    
+    addWallpaperButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
+    [addWallpaperButton addTarget:self action:@selector(didTouchAddWallpaper:) forControlEvents:UIControlEventTouchDown];
+    [addWallpaperButton setTitle:@"+" forState:UIControlStateNormal];
+    addWallpaperButton.frame = CGRectMake(DISPLAY_WIDTH - 50, DISPLAY_HEIGHT - 50, 25, 25);
+    
+    changeHomescreenButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
+    [changeHomescreenButton addTarget:self action:@selector(didTouchChangeTemplate:) forControlEvents:UIControlEventTouchDown];
+    [changeHomescreenButton setTitle:@"+" forState:UIControlStateNormal];
+    changeHomescreenButton.frame = CGRectMake(DISPLAY_WIDTH - 50, 50, 25, 25);
+    
+    
+    
+	// Finally, add the UIScrollView to the controller's view
+    [self.view addSubview:wallpaperScrollView];
+    [self.view addSubview:thumbnailScrollView];
+    [self.view addSubview:addWallpaperButton];
+    [self.view addSubview:changeHomescreenButton];
+    
+
 }
 
 - (IBAction) didTouchAddWallpaper:(id)sender{

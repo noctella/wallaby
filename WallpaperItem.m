@@ -89,6 +89,8 @@
         wallpaperView = [[UIImageView alloc]init];
         wallpaperView.userInteractionEnabled = YES;
         
+        background = [self getBackground];
+        
     }
     
     return self;
