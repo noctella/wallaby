@@ -20,6 +20,7 @@
 #import "WallpaperDatabase.h"
 #import "tesseract.h"
 #import "IconItem.h"
+#import "ImageUtils.h"
 
 
 @implementation WallpaperProcessor
@@ -52,12 +53,12 @@ static UIImage *mask;
     [WallpaperDatabase saveTemplate: template];
 }
 
-+ (UIImage *) processHomescreen: (UIImage *) image{
++ (void) setTemplateAndIconsWithHomescreen: (UIImage *) image{
     
    
-     UIImage *homescreen = [[UIImage alloc] initWithCGImage:image.CGImage scale:DISPLAY_SCALE orientation:UIImageOrientationUp];
+     UIImage *homescreen = [ImageUtils scaleImage:image];
     NSLog(@"processing the homescreen, %@", homescreen);
-    UIImage *template = [[UIImage alloc] initWithCGImage:[UIImage imageNamed: @"transparentWallpaper.png"].CGImage scale:DISPLAY_SCALE orientation:UIImageOrientationUp];
+    UIImage *template = [ImageUtils scaleImagedName:@"transparentWallpaper.png"];
     
       UIImage *formattedHomescreen = [self formatImage:homescreen];
 
@@ -66,8 +67,9 @@ static UIImage *mask;
     
     for(IconItem *item in [IconItem items]){
         if([item isPresent]){
-            UIImage *icon = [self maskAndCropImage:formattedHomescreen withX:[item iconPosition].origin.x withY:[item iconPosition].origin.y withMask:[self mask]];
-            template = [self MergeImage:template withImage:icon atXLoc: [item iconPosition].origin.x atYLoc: [item iconPosition].origin.y];
+            UIImage *icon = [self maskAndCropImage:formattedHomescreen withX:[item iconTemplatePosition].origin.x withY:[item iconTemplatePosition].origin.y withMask:[self mask]];
+            
+            template = [self MergeImage:template withImage:icon atXLoc: [item iconTemplatePosition].origin.x atYLoc: [item iconTemplatePosition].origin.y];
             
             UIImage *title = [self cropImage:formattedHomescreen toRect:CGRectMake([item labelPosition].origin.x, [item labelPosition].origin.y, 122, 30)];
             [tesseract setImage:title];
@@ -76,53 +78,15 @@ static UIImage *mask;
             label =  [label
                       stringByReplacingOccurrencesOfString:@" " withString:@""];
             template = [self drawText:label inImage:template atPoint:CGPointMake([item labelPosition].origin.x, [item labelPosition].origin.y)];
+            
+            [item setIcon:icon];
+            [item setLabel:label];
         }
     }
 
-    //main icons
-    /*for(int i=0; i<4; i++){
-        for(int j=0; j< 5; j++){
-            int x = 32 + (152*i);
-            int y = 50 + (176*j);
-            
-        }
-    }
-    
-    //bottom icons
-    for(int i=0; i< 4; i++){
-        int x = 32 + (152*i);
-        int y = 972;
-        UIImage *icon = [self maskAndCropImage:formattedHomescreen withX:x withY:y withMask:[self mask]];
-        template = [self MergeImage:template withImage:icon atXLoc: x atYLoc: y];
-    }
-    
-  
-   
-    
-    //main labels
-    for(int i=0; i<4; i++){
-        for(int j=0; j< 5; j++){
-            int x = 32 + (152*i);
-            int y = 173 + (176*j);
-            
-
-        }
-    }
-    
-    //bottom labels
-    for(int i=0; i< 4; i++){
-        int x = 30 + (150*i);
-        int y = 1094;
-        UIImage *title = [self cropImage:formattedHomescreen toRect:CGRectMake(x, y, 132, 30)];
-        [tesseract setImage:title];
-        [tesseract recognize];
-        NSString *label = [tesseract recognizedText];
-        label =  [label
-                  stringByReplacingOccurrencesOfString:@" " withString:@""];
-        template = [self drawText:label inImage:template atPoint:CGPointMake(x, y)];
- 
-    }*/
-    return template;
+    [self setTemplate:template];
+    [WallpaperDatabase saveTemplate:template];
+    [WallpaperDatabase saveIconItems:[IconItem items]];
 }
 
 + (UIImage *)process: (UIImage *)wallpaper{

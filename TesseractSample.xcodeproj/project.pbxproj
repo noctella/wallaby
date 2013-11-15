@@ -11,6 +11,9 @@
 		62017E34180E20B200C3A2E5 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 62017E33180E20B200C3A2E5 /* QuartzCore.framework */; };
 		620F9E8D1821F4E600CF5862 /* template_grey.png in Resources */ = {isa = PBXBuildFile; fileRef = 620F9E8C1821F4E600CF5862 /* template_grey.png */; };
 		6226242A183075AF00658A19 /* mask_clear@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 62262429183075AF00658A19 /* mask_clear@2x.png */; };
+		6226242D18346C3800658A19 /* ImageUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 6226242C18346C3800658A19 /* ImageUtils.m */; };
+		6226242F183470D000658A19 /* add_wallpaper_icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 6226242E183470D000658A19 /* add_wallpaper_icon.png */; };
+		62262431183474B500658A19 /* add_wallpaper_icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 62262430183474B500658A19 /* add_wallpaper_icon@2x.png */; };
 		625151861829DEC400391474 /* mask_grey@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 625151851829DEC400391474 /* mask_grey@2x.png */; };
 		625151881829E28E00391474 /* Reveal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 625151871829E28E00391474 /* Reveal.framework */; };
 		625AB163181A0ABD00398DA1 /* EditTemplateController.m in Sources */ = {isa = PBXBuildFile; fileRef = 625AB161181A0ABD00398DA1 /* EditTemplateController.m */; };
@@ -69,6 +72,10 @@
 		62017E33180E20B200C3A2E5 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		620F9E8C1821F4E600CF5862 /* template_grey.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = template_grey.png; sourceTree = "<group>"; };
 		62262429183075AF00658A19 /* mask_clear@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "mask_clear@2x.png"; sourceTree = "<group>"; };
+		6226242B18346C3800658A19 /* ImageUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageUtils.h; sourceTree = "<group>"; };
+		6226242C18346C3800658A19 /* ImageUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageUtils.m; sourceTree = "<group>"; };
+		6226242E183470D000658A19 /* add_wallpaper_icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = add_wallpaper_icon.png; sourceTree = "<group>"; };
+		62262430183474B500658A19 /* add_wallpaper_icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "add_wallpaper_icon@2x.png"; sourceTree = "<group>"; };
 		625151851829DEC400391474 /* mask_grey@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "mask_grey@2x.png"; sourceTree = "<group>"; };
 		625151871829E28E00391474 /* Reveal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Reveal.framework; sourceTree = "<group>"; };
 		625AB160181A0ABD00398DA1 /* EditTemplateController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditTemplateController.h; sourceTree = "<group>"; };
@@ -561,33 +568,37 @@
 				62F2C40717FA570E00C15DA7 /* WallpaperItem.h */,
 				62F2C40817FA570E00C15DA7 /* WallpaperItem.m */,
 				62F2C40E17FA570E00C15DA7 /* WWallpaperController.h */,
-				620F9E8C1821F4E600CF5862 /* template_grey.png */,
+				62F2C40F17FA570E00C15DA7 /* WWallpaperController.m */,
 				62F2C40917FA570E00C15DA7 /* WallpaperProcessor.h */,
 				62F2C40A17FA570E00C15DA7 /* WallpaperProcessor.m */,
 				62F2C40B17FA570E00C15DA7 /* WallpaperZoomController.h */,
 				62F2C40C17FA570E00C15DA7 /* WallpaperZoomController.m */,
 				62F2C40D17FA570E00C15DA7 /* WallpaperZoomController.xib */,
-				626020A017FE608B00BC80D7 /* transparentWallpaper.png */,
 				6260209B17FE529D00BC80D7 /* ChangeHomescreenController.h */,
 				6260209C17FE529D00BC80D7 /* ChangeHomescreenController.m */,
-				625151871829E28E00391474 /* Reveal.framework */,
 				625AB160181A0ABD00398DA1 /* EditTemplateController.h */,
 				625AB161181A0ABD00398DA1 /* EditTemplateController.m */,
+				6226242B18346C3800658A19 /* ImageUtils.h */,
+				6226242C18346C3800658A19 /* ImageUtils.m */,
 				625AB165181DE96600398DA1 /* IconItem.h */,
 				625AB166181DE96600398DA1 /* IconItem.m */,
 				6260209D17FE529D00BC80D7 /* ChangeHomescreenController.xib */,
-				62F2C40F17FA570E00C15DA7 /* WWallpaperController.m */,
 				6260209817FE4F2800BC80D7 /* InfiniteScrollView.h */,
 				6260209917FE4F2800BC80D7 /* InfiniteScrollView.m */,
 				626020A218063BF600BC80D7 /* InfiniteThumbnailScrollView.h */,
 				626020A318063BF600BC80D7 /* InfiniteThumbnailScrollView.m */,
 				62F2C41017FA570E00C15DA7 /* WWallpaperController.xib */,
 				62F2C32117FA56D900C15DA7 /* AppDelegate.h */,
+				6226242E183470D000658A19 /* add_wallpaper_icon.png */,
+				626020A017FE608B00BC80D7 /* transparentWallpaper.png */,
 				62F2C32217FA56D900C15DA7 /* AppDelegate.m */,
+				620F9E8C1821F4E600CF5862 /* template_grey.png */,
 				62F2C32317FA56D900C15DA7 /* Default-568h@2x.png */,
 				62262429183075AF00658A19 /* mask_clear@2x.png */,
 				62F2C32417FA56D900C15DA7 /* Default.png */,
+				62262430183474B500658A19 /* add_wallpaper_icon@2x.png */,
 				62F2C32517FA56D900C15DA7 /* Default@2x.png */,
+				625151871829E28E00391474 /* Reveal.framework */,
 				62F2C32617FA56D900C15DA7 /* ELCImagePicker */,
 				62F2C33917FA56D900C15DA7 /* en.lproj */,
 				62F2C33E17FA56D900C15DA7 /* main.m */,
@@ -690,6 +701,7 @@
 				626020A117FE608B00BC80D7 /* transparentWallpaper.png in Resources */,
 				62F2C41717FA570E00C15DA7 /* WWallpaperController.xib in Resources */,
 				62F2C3F117FA56DA00C15DA7 /* ELCAssetTablePicker.xib in Resources */,
+				6226242F183470D000658A19 /* add_wallpaper_icon.png in Resources */,
 				62F2C40217FA56DA00C15DA7 /* testLarge@2x.png in Resources */,
 				62F2C3EF17FA56DA00C15DA7 /* ELCAlbumPickerController.xib in Resources */,
 				62F2C3F217FA56DA00C15DA7 /* Overlay.png in Resources */,
@@ -701,6 +713,7 @@
 				62F2C3E717FA56DA00C15DA7 /* Default-568h@2x.png in Resources */,
 				62F2C3F317FA56DA00C15DA7 /* Overlay@2x.png in Resources */,
 				62F2C40017FA56DA00C15DA7 /* TesseractSample-Info.plist in Resources */,
+				62262431183474B500658A19 /* add_wallpaper_icon@2x.png in Resources */,
 				6260209F17FE529D00BC80D7 /* ChangeHomescreenController.xib in Resources */,
 				62F2C3FC17FA56DA00C15DA7 /* .gitignore in Resources */,
 				62F2C3FB17FA56DA00C15DA7 /* README.md in Resources */,
@@ -731,6 +744,7 @@
 				62F2C41217FA570E00C15DA7 /* WallpaperItem.m in Sources */,
 				62F2C41317FA570E00C15DA7 /* WallpaperProcessor.m in Sources */,
 				62F2C3E617FA56DA00C15DA7 /* AppDelegate.m in Sources */,
+				6226242D18346C3800658A19 /* ImageUtils.m in Sources */,
 				62F2C41417FA570E00C15DA7 /* WallpaperZoomController.m in Sources */,
 				626020A418063BF600BC80D7 /* InfiniteThumbnailScrollView.m in Sources */,
 				6260209E17FE529D00BC80D7 /* ChangeHomescreenController.m in Sources */,

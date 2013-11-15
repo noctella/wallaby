@@ -16,6 +16,13 @@
 #import "InfiniteScrollView.h"
 #import "InfiniteThumbnailScrollView.h"
 #import "ChangeHomescreenController.h"
+#import "ImageUtils.h"
+#import "IconItem.h"
+#import "Tesseract.h"
+
+#define PIXEL_SIZE(size) IS_RETINA_DISPLAY() ? CGSizeMake(size.width/2.0f, size.height/2.0f) : size
+#define SCREEN_HEIGHT 568
+#define SCREEN_WIDTH 320
 
 
 #define BUFFER_SIZE 6
@@ -56,7 +63,7 @@ static NSMutableArray *visibleWallpapers;
 static NSMutableArray *wallpaperTapGestureRecognizers;
 static InfiniteScrollView *wallpaperScrollView;
 static InfiniteThumbnailScrollView *thumbnailScrollView;
-
+static UIImage *mask;
 
 
 
@@ -100,57 +107,13 @@ static InfiniteThumbnailScrollView *thumbnailScrollView;
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         wallpaperItems = [WallpaperDatabase loadWallpapers];
+        
        
         visibleWallpapers = [[NSMutableArray alloc]init];
         wallpaperTapGestureRecognizers = [[NSMutableArray alloc]initWithCapacity:BUFFER_SIZE];
         NSLog(@"creating view controller");
     }
     return self;
-}
-
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    /*if(scrollView == wallpaperScrollView){
-        [self updateWallpaperContentOffset];
-    }else if(scrollView == thumbnailScrollView){
-        [self updateThumbnailContentOffset];
-    }*/
-    
-}
-
-
-
-
-
-- (void)forwardInvocation:(NSInvocation *)anInvocation {
-    if ([self.scrollViewDelegate respondsToSelector:[anInvocation selector]]) {
-        [anInvocation invokeWithTarget:self.scrollViewDelegate];
-    } else {
-        [super forwardInvocation:anInvocation];
-    }
-}
-
-- (BOOL)respondsToSelector:(SEL)aSelector {
-    return ([super respondsToSelector:aSelector] ||
-            [self.scrollViewDelegate respondsToSelector:aSelector]);
-}
-
-- (void)updateWallpaperContentOffset {
-    CGFloat offsetX   = wallpaperScrollView.contentOffset.x;
-   thumbnailScrollView.contentOffset = CGPointMake(offsetX/RATIO_WITH_PADDING, 0.0f);
-}
-
-
-- (void)updateThumbnailContentOffset {
-    /*NSInteger visibleWallpaperIndex = offsetX/(WALLPAPER_WIDTH/WALLPAPER_PADDING);
-    visibleWallpaperIndex = MIN([wallpaperItems count], visibleWallpaperIndex);
-    NSLog(@"visible wallpaper index: %ld", (long)visibleWallpaperIndex);
-    NSRange range = [self getPositiveRangeFromValue:visibleWallpaperIndex withSize:BUFFER_SIZE notGreaterThan:[wallpaperItems count]-1];
-    
-    for(int i= range.location; i<range.location + range.length; i++){
-        [[wallpaperItems objectAtIndex:i] loadData];
-    }
-    wallpaperScrollView.contentOffset = CGPointMake(offsetX*RATIO_WITH_PADDING, 0.0f);*/
-    
 }
 
 
@@ -162,14 +125,10 @@ static InfiniteThumbnailScrollView *thumbnailScrollView;
     
     if (template == nil){
         UIImage *homescreen = [UIImage imageNamed: @"testLarge.png"];
-        template = [WallpaperProcessor processHomescreen:homescreen];
-        [WallpaperProcessor setTemplate:template];
-        [WallpaperDatabase saveTemplate: template];
+        [WallpaperProcessor setTemplateAndIconsWithHomescreen:homescreen];
         NSLog(@"homescreen was nil :)");
     }
-    [WallpaperProcessor setTemplate:template];
 
-    // Now create a UIScrollView to hold the UIImageViews
    
     thumbnailScrollView = [[InfiniteThumbnailScrollView alloc]initWithWallpaperItems:wallpaperItems];
      wallpaperScrollView = [[InfiniteScrollView alloc]initWithWallpaperItems:wallpaperItems ];
@@ -180,16 +139,21 @@ static InfiniteThumbnailScrollView *thumbnailScrollView;
     [thumbnailScrollView setPairedScrollView:wallpaperScrollView];
     
     [wallpaperScrollView setAvailableWallpaperItems:[thumbnailScrollView availableWallpaperItems]];
-
-    addWallpaperButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
-    [addWallpaperButton addTarget:self action:@selector(didTouchAddWallpaper:) forControlEvents:UIControlEventTouchDown];
-    [addWallpaperButton setTitle:@"+" forState:UIControlStateNormal];
-    addWallpaperButton.frame = CGRectMake(DISPLAY_WIDTH - 50, DISPLAY_HEIGHT - 50, 25, 25);
     
-    changeHomescreenButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
+    addWallpaperButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [addWallpaperButton setBackgroundImage: [UIImage imageNamed:@"add_wallpaper_icon.png"] forState:UIControlStateNormal];
+    [addWallpaperButton addTarget:self action:@selector(didTouchAddWallpaper:) forControlEvents:UIControlEventTouchDown];
+    addWallpaperButton.frame = CGRectMake(DISPLAY_WIDTH - 70, DISPLAY_HEIGHT - 70, 60, 60);
+    
+    changeHomescreenButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [changeHomescreenButton setBackgroundImage:[UIImage imageNamed:@"add_wallpaper_icon.png"]forState:UIControlStateNormal];
     [changeHomescreenButton addTarget:self action:@selector(didTouchChangeTemplate:) forControlEvents:UIControlEventTouchDown];
-    [changeHomescreenButton setTitle:@"+" forState:UIControlStateNormal];
-    changeHomescreenButton.frame = CGRectMake(DISPLAY_WIDTH - 50, 50, 25, 25);
+    changeHomescreenButton.frame = CGRectMake(DISPLAY_WIDTH - 30, 30, 50, 50);
+    
+   
+    
+    
+    
     
     
 
@@ -198,6 +162,9 @@ static InfiniteThumbnailScrollView *thumbnailScrollView;
     [self.view addSubview:thumbnailScrollView];
     [self.view addSubview:addWallpaperButton];
     [self.view addSubview:changeHomescreenButton];
+    
+    
+
 
 }
 
@@ -217,23 +184,25 @@ static InfiniteThumbnailScrollView *thumbnailScrollView;
     
     [wallpaperScrollView setAvailableWallpaperItems:[thumbnailScrollView availableWallpaperItems]];
     
-    addWallpaperButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
-    [addWallpaperButton addTarget:self action:@selector(didTouchAddWallpaper:) forControlEvents:UIControlEventTouchDown];
-    [addWallpaperButton setTitle:@"+" forState:UIControlStateNormal];
-    addWallpaperButton.frame = CGRectMake(DISPLAY_WIDTH - 50, DISPLAY_HEIGHT - 50, 25, 25);
-    
-    changeHomescreenButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
-    [changeHomescreenButton addTarget:self action:@selector(didTouchChangeTemplate:) forControlEvents:UIControlEventTouchDown];
-    [changeHomescreenButton setTitle:@"+" forState:UIControlStateNormal];
-    changeHomescreenButton.frame = CGRectMake(DISPLAY_WIDTH - 50, 50, 25, 25);
-    
-    
-    
 	// Finally, add the UIScrollView to the controller's view
     [self.view addSubview:wallpaperScrollView];
     [self.view addSubview:thumbnailScrollView];
     [self.view addSubview:addWallpaperButton];
     [self.view addSubview:changeHomescreenButton];
+    
+    UIImage *homescreen = [ImageUtils scaleImage:[WallpaperProcessor template]];
+    NSLog(@"processing the homescreen, %@", homescreen);
+    UIImage *template = [ImageUtils scaleImagedName:@"transparentWallpaper.png"];
+    
+    for(IconItem *item in [IconItem items]){
+        if([item isPresent]){
+            UIImageView *imageView = [[UIImageView alloc]initWithImage:[item icon]];
+            [self.view addSubview:imageView];
+            
+            template = [self drawText:[item label] inImage:template atPoint:CGPointMake([item labelPosition].origin.x, [item labelPosition].origin.y)];
+        }
+    }
+
     
 
 }
@@ -301,5 +270,100 @@ static InfiniteThumbnailScrollView *thumbnailScrollView;
 {
     [self dismissViewControllerAnimated:YES completion:nil];
 }
+
+- (UIImage *) cropImage: (UIImage *) image toRect: (CGRect)rect
+{
+    // Create bitmap image from original image data,
+    // using rectangle to specify desired crop area
+    CGImageRef imageRef = CGImageCreateWithImageInRect([image CGImage], rect);
+    UIImage *img = [UIImage imageWithCGImage:imageRef];
+    // CGImageRelease(imageRef);
+    
+    return img;
+}
+
+-(UIImage *) formatImage: (UIImage *) wallpaper{
+    //Crop image to the max rect it can be
+    float height = wallpaper.size.height;
+    float width = (SCREEN_WIDTH * height)/SCREEN_HEIGHT;
+    
+    if(wallpaper.size.width < width){
+        width = wallpaper.size.width;
+        height = (SCREEN_HEIGHT*width)/SCREEN_HEIGHT;
+    }
+    
+    float heightRatio = SCREEN_HEIGHT/height;
+    UIImage *formattedImage = [self cropImage:wallpaper toRect:CGRectMake(0, 0, width*2, height*2)];
+    
+    return [self imageWithImage:formattedImage scaledToSize: CGSizeMake(width  * heightRatio * 2, height * heightRatio * 2)];
+    
+}
+
+- (UIImage*)imageWithImage:(UIImage*)image
+              scaledToSize:(CGSize)newSize;
+{
+    UIGraphicsBeginImageContext( newSize );
+    [image drawInRect:CGRectMake(0,0,newSize.width,newSize.height)];
+    UIImage* newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return newImage;
+}
+
+
+- (UIImage*) drawText:(NSString*) text inImage:(UIImage*)  image atPoint:(CGPoint)   point
+{
+    //convert image1 from UIImage to CGImageRef to get Width and Height
+    CGImageRef img1Ref = image.CGImage;
+    float img1W        = CGImageGetWidth(img1Ref);
+    float img1H        = CGImageGetHeight(img1Ref);
+    
+    CGSize size = CGSizeMake(img1W, img1H);
+    
+    UIGraphicsBeginImageContext(size);
+    UIFont *font = [UIFont fontWithName:@"HelveticaNeue" size:24];
+    [image drawInRect:CGRectMake(0,0,img1W,img1H)];
+    CGRect rect = CGRectMake(point.x, point.y, 120, img1H);
+    [[UIColor whiteColor] set];
+    //[text drawInRect:CGRectIntegral(rect) withFont:font];
+    [text drawInRect:rect withFont:font lineBreakMode:NSLineBreakByClipping alignment:NSTextAlignmentCenter];
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return newImage;
+}
+
+- (UIImage *) mask
+{
+    @synchronized(self){
+        if(mask == nil){
+            mask = [[UIImage alloc] initWithCGImage:[UIImage imageNamed: @"mask.png"].CGImage scale:DISPLAY_SCALE orientation:UIImageOrientationUp];
+        }
+        return mask;
+    }
+}
+
+
+- (UIImage*) maskAndCropImage:(UIImage *)image withX: (float) x withY: (float) y withMask:(UIImage *)maskImage {
+    CGRect rect = CGRectMake(x, y , 120, 120);
+    
+    CGImageRef imageRef = CGImageCreateWithImageInRect([image CGImage], rect);
+    image = [UIImage imageWithCGImage:imageRef];
+    CGImageRelease(imageRef);
+    
+	CGImageRef maskRef = maskImage.CGImage;
+    
+	CGImageRef mask = CGImageMaskCreate(CGImageGetWidth(maskRef),
+                                        CGImageGetHeight(maskRef),
+                                        CGImageGetBitsPerComponent(maskRef),
+                                        CGImageGetBitsPerPixel(maskRef),
+                                        CGImageGetBytesPerRow(maskRef),
+                                        CGImageGetDataProvider(maskRef), NULL, false);
+    
+	CGImageRef masked = CGImageCreateWithMask([image CGImage], mask);
+	return [UIImage imageWithCGImage:masked];
+}
+    
+
 
 @end

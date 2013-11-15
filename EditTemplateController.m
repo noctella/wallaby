@@ -11,11 +11,8 @@
 #import "WallpaperDatabase.h"
 #import "IconItem.h"
 #import "objc/runtime.h"
+#import "ImageUtils.h"
 
-#define IS_RETINA_DISPLAY() [[UIScreen mainScreen] respondsToSelector:@selector(scale)] && [[UIScreen mainScreen] scale] == 2.0f
-
-// return the scale value based on device's display (2 retina, 1 other)
-#define DISPLAY_SCALE IS_RETINA_DISPLAY() ? 2.0f : 1.0f
 
 @interface EditTemplateController ()
 
@@ -35,7 +32,7 @@
     
     
     
-    UIImage *scaledHomescreen = [[UIImage alloc] initWithCGImage:homescreen.CGImage scale:DISPLAY_SCALE orientation:UIImageOrientationUp];
+    UIImage *scaledHomescreen = [ImageUtils scaleImage:homescreen];
     
     self->homescreen = scaledHomescreen;
 
@@ -46,16 +43,15 @@
 
     //[greyHomescreenView setFrame:<#(CGRect)#>
     
-    UIImage *greyHomescreen= [[UIImage alloc] initWithCGImage:[UIImage imageNamed: @"template_grey.png"].CGImage scale:DISPLAY_SCALE orientation:UIImageOrientationUp];
-    UIImageView *greyHomescreenView = [[UIImageView alloc]initWithImage:greyHomescreen];
+    UIImageView *greyHomescreenView = [ImageUtils imageViewWithImageNamed:@"template_grey.png"];
     [greyHomescreenView setContentMode:UIViewContentModeTop];
 
     [[self view]addSubview:greyHomescreenView];
     NSMutableArray *items = [IconItem items];
     for(IconItem *item in items){
-        [[item greyIconView]addGestureRecognizer:[item appSelectionTap]];
+        [[item greyIconTemplateView]addGestureRecognizer:[item appSelectionTap]];
         [[item appSelectionTap] addTarget:self action:@selector(didTapApp:)];
-        [[self view]addSubview:[item greyIconView]];
+        [[self view]addSubview:[item greyIconTemplateView]];
     }
     
     UIButton *doneButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
@@ -66,9 +62,7 @@
 }
 
 - (IBAction)didTouchDoneButton:(id)sender{
-    UIImage *template = [WallpaperProcessor processHomescreen:homescreen];
-    [WallpaperProcessor setTemplate:template];
-    
+    [WallpaperProcessor setTemplateAndIconsWithHomescreen:homescreen];
     [self dismissViewControllerAnimated:YES completion:^(void){
         
     }];
@@ -78,14 +72,14 @@
     NSLog(@"didTap app");
     IconItem *item = objc_getAssociatedObject(sender, "iconItem");
     if([item isPresent]){
-        [[self view]addSubview:[item greyIconView]];
-        [[item greyIconView]addGestureRecognizer:[item appSelectionTap]];
-        [[item clearIconView] removeFromSuperview];
+        [[self view]addSubview:[item greyIconTemplateView]];
+        [[item greyIconTemplateView]addGestureRecognizer:[item appSelectionTap]];
+        [[item clearIconTemplateView] removeFromSuperview];
         [item setIsPresent:NO];
     }else{
-        [[item greyIconView] removeFromSuperview];
-        [[self view]addSubview:[item clearIconView]];
-        [[item clearIconView] addGestureRecognizer:[item appSelectionTap]];
+        [[item greyIconTemplateView] removeFromSuperview];
+        [[self view]addSubview:[item clearIconTemplateView]];
+        [[item clearIconTemplateView] addGestureRecognizer:[item appSelectionTap]];
         [item setIsPresent:YES];
     }
 

@@ -8,17 +8,21 @@
 
 #import <Foundation/Foundation.h>
 
-@interface IconItem : NSObject
+@interface IconItem : NSObject <NSCoding>
 
 
--(id) initWithIconPosition: (CGRect) iconPosition andLabelPosition: (CGRect) labelPosition;
+-(id) initWithIconTemplatePosition: (CGRect) iconPosition andLabelTemplatePosition: (CGRect) labelPosition;
 
 + (NSMutableArray *) items;
 
-@property CGRect iconPosition;
-@property CGRect labelPosition;
+-(void) encodeWithCoder: (NSCoder *) encoder;
+-(id) initWithCoder: (NSCoder *) decoder;
+
+@property CGRect iconTemplatePosition, iconPosition;
+@property CGRect labelTemplatePosition, labelPosition;
 @property BOOL isPresent;
 @property NSString *label;
-@property UIImageView *greyIconView, *clearIconView;
+@property UIImageView *greyIconTemplateView, *clearIconTemplateView;
+@property UIImage *icon;
 @property UITapGestureRecognizer *appSelectionTap;
 @end

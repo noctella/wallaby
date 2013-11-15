@@ -12,6 +12,8 @@
 
 + (NSMutableArray *)loadWallpapers;
 + (UIImage *) loadTemplate;
++ (void) saveIconItems: (NSMutableArray *) IconItems;
++ (NSMutableArray *) loadIconItems;
 + (void) saveTemplate: (UIImage *)image;
 + (NSString *)nextWallpaperPath;
 

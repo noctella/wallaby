@@ -8,7 +8,9 @@
 
 #import "WallpaperDatabase.h"
 #import "WallpaperItem.h"
+#import "IconItem.h"
 #define TEMPLATE_IMAGE_FILE @"template.png"
+#define ICON_ITEMS_FILE @"iconItems"
 
 @implementation WallpaperDatabase
 
@@ -42,6 +44,52 @@
     [templateImageData writeToFile:templatePath atomically:YES];
     NSLog(@"saved the new template");
 
+}
+
++ (void) saveIconItems: (NSMutableArray *) IconItems{
+    
+   
+    // Get private docs dir
+    NSString *documentsDirectory = [WallpaperDatabase getPrivateDocsDir];
+    NSString *iconItemsPath = [documentsDirectory stringByAppendingPathComponent:ICON_ITEMS_FILE];
+     NSError *error;
+    BOOL success = [[NSFileManager defaultManager] createDirectoryAtPath:iconItemsPath withIntermediateDirectories:YES attributes:nil error:&error];
+    if (!success) {
+        NSLog(@"Error creating data path: %@", [error localizedDescription]);
+    }
+    
+    int path = 0;
+    for(IconItem *item in [IconItem items]){
+        NSData *iconItemsData = [NSKeyedArchiver archivedDataWithRootObject:item];
+        NSString *availableName = [NSString stringWithFormat:@"%d.iconItem", path];
+        NSString *fullPath = [iconItemsPath stringByAppendingPathComponent:availableName];
+        [iconItemsData writeToFile:fullPath atomically:YES];
+        path++;
+    }
+    
+    NSLog(@"saved icon items");
+}
+
++ (NSMutableArray *) loadIconItems {
+    // Get private docs dir
+    NSString *documentsDirectory = [WallpaperDatabase getPrivateDocsDir];
+    NSString *iconItemsPath = [documentsDirectory stringByAppendingPathComponent:ICON_ITEMS_FILE];
+    NSMutableArray *iconItems = [[NSMutableArray alloc]init];
+
+ 
+    for(int path =0; path< 24; path++){
+        NSString *availableName = [NSString stringWithFormat:@"%d.iconItem", path];
+        NSString *fullPath = [iconItemsPath stringByAppendingPathComponent:availableName];
+        NSData *itemData = [[NSData alloc]initWithContentsOfFile:fullPath];
+        if(itemData == nil)return nil;
+        NSKeyedUnarchiver *unArchiver = [[NSKeyedUnarchiver alloc]initForReadingWithData:itemData];
+        IconItem *item = [[IconItem alloc]initWithCoder:unArchiver];
+        [iconItems addObject:item];
+        path++;
+    }
+    
+    NSLog(@"loaded icon items");
+    return iconItems;
 }
 
 + (NSMutableArray *)loadWallpapers {
