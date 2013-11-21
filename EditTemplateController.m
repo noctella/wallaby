@@ -49,9 +49,25 @@
     [[self view]addSubview:greyHomescreenView];
     NSMutableArray *items = [IconItem items];
     for(IconItem *item in items){
-        [[item greyIconTemplateView]addGestureRecognizer:[item appSelectionTap]];
-        [[item appSelectionTap] addTarget:self action:@selector(didTapApp:)];
+         UITapGestureRecognizer *appSelectionTap = [[UITapGestureRecognizer alloc] init];
+         objc_setAssociatedObject(appSelectionTap, "iconItem", item, OBJC_ASSOCIATION_ASSIGN);
+        
+        [appSelectionTap addTarget:self action:@selector(didTapApp:)];
+        [item setGreyIconTemplateView:[ImageUtils imageViewWithImageNamed:@"mask_grey.png"]];
+        [[item greyIconTemplateView]addGestureRecognizer:appSelectionTap];
+        [[item greyIconTemplateView] setFrame:CGRectMake([item iconTemplatePosition].origin.x/2 + 2, [item iconTemplatePosition].origin.y/2 + 2, [item iconTemplatePosition].size.width/2, [item iconTemplatePosition].size.height/2)];
+        [[item greyIconTemplateView] setUserInteractionEnabled:YES];
         [[self view]addSubview:[item greyIconTemplateView]];
+        
+        
+        UITapGestureRecognizer *appSelectionTap2 = [[UITapGestureRecognizer alloc] init];
+        objc_setAssociatedObject(appSelectionTap2, "iconItem", item, OBJC_ASSOCIATION_ASSIGN);
+        
+        [appSelectionTap2 addTarget:self action:@selector(didTapApp:)];
+        [[item clearIconTemplateView] setUserInteractionEnabled:YES];
+        [[item clearIconTemplateView] addGestureRecognizer:appSelectionTap2];
+        
+        
     }
     
     UIButton *doneButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
@@ -73,13 +89,11 @@
     IconItem *item = objc_getAssociatedObject(sender, "iconItem");
     if([item isPresent]){
         [[self view]addSubview:[item greyIconTemplateView]];
-        [[item greyIconTemplateView]addGestureRecognizer:[item appSelectionTap]];
         [[item clearIconTemplateView] removeFromSuperview];
         [item setIsPresent:NO];
     }else{
         [[item greyIconTemplateView] removeFromSuperview];
         [[self view]addSubview:[item clearIconTemplateView]];
-        [[item clearIconTemplateView] addGestureRecognizer:[item appSelectionTap]];
         [item setIsPresent:YES];
     }
 

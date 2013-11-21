@@ -82,11 +82,11 @@ static UIImage *mask;
     @synchronized(self){
         template = image;
         [WallpaperProcessor setTemplate:template];
-        for(WallpaperItem *wallpaperItem in wallpaperItems){
+        /*for(WallpaperItem *wallpaperItem in wallpaperItems){
             UIImage *wallpaper =[WallpaperProcessor process: [wallpaperItem getBackground]];
             [[wallpaperItem wallpaperView]setImage:wallpaper];
             [wallpaperItem setWallpaper: wallpaper];
-        }
+        }*/
       
     }
 }
@@ -194,14 +194,16 @@ static UIImage *mask;
     NSLog(@"processing the homescreen, %@", homescreen);
     UIImage *template = [ImageUtils scaleImagedName:@"transparentWallpaper.png"];
     
-    for(IconItem *item in [IconItem items]){
+    /*for(IconItem *item in [IconItem items]){
         if([item isPresent]){
             UIImageView *imageView = [[UIImageView alloc]initWithImage:[item icon]];
             [self.view addSubview:imageView];
             
             template = [self drawText:[item label] inImage:template atPoint:CGPointMake([item labelPosition].origin.x, [item labelPosition].origin.y)];
         }
-    }
+    }*/
+    
+    [self.view addSubview:[ImageUtils imageViewWithImage:homescreen]];
 
     
 
@@ -255,10 +257,10 @@ static UIImage *mask;
     [self dismissViewControllerAnimated:YES completion:nil];
 	   
 	for(NSDictionary *dict in info) {
-        UIImage *image = [dict objectForKey:UIImagePickerControllerOriginalImage];
-        UIImage *wallpaper = [WallpaperProcessor process: image ];
-        UIImage *thumbnail = [WallpaperProcessor makeThumbnail: image];
-        WallpaperItem *wallpaperItem = [[WallpaperItem alloc] initWithWallpaper:wallpaper andBackground:image andThumbnail:thumbnail];
+        UIImage *wallpaper = [dict objectForKey:UIImagePickerControllerOriginalImage];
+        //UIImage *wallpaper = [WallpaperProcessor process: image ];
+        UIImage *thumbnail = [WallpaperProcessor makeThumbnail: wallpaper];
+        WallpaperItem *wallpaperItem = [[WallpaperItem alloc] initWithWallpaper:wallpaper andBackground:wallpaper andThumbnail:thumbnail];
         [wallpaperItem setIndex:[wallpaperItems count]];
         [wallpaperItems addObject:wallpaperItem];
         [wallpaperItem saveData];

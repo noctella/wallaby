@@ -80,12 +80,15 @@
     for(int path =0; path< 24; path++){
         NSString *availableName = [NSString stringWithFormat:@"%d.iconItem", path];
         NSString *fullPath = [iconItemsPath stringByAppendingPathComponent:availableName];
-        NSData *itemData = [[NSData alloc]initWithContentsOfFile:fullPath];
-        if(itemData == nil)return nil;
-        NSKeyedUnarchiver *unArchiver = [[NSKeyedUnarchiver alloc]initForReadingWithData:itemData];
-        IconItem *item = [[IconItem alloc]initWithCoder:unArchiver];
+       // NSData *itemData = [[NSData alloc]initWithContentsOfFile:fullPath];
+       // if(itemData == nil)return nil;
+       // NSKeyedUnarchiver *unArchiver = [[NSKeyedUnarchiver alloc]initForReadingWithData:itemData];
+       // IconItem *item = [[IconItem alloc]initWithCoder:unArchiver];
+        IconItem *item = [NSKeyedUnarchiver unarchiveObjectWithFile:fullPath];
+        if(item == nil){
+          return nil;
+        }
         [iconItems addObject:item];
-        path++;
     }
     
     NSLog(@"loaded icon items");

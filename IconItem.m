@@ -65,8 +65,7 @@ static NSMutableArray *items;
     UIImage *greyIcon= [[UIImage alloc] initWithCGImage:[UIImage imageNamed: @"mask_grey.png"].CGImage scale:DISPLAY_SCALE orientation:UIImageOrientationUp];
     UIImageView *greyIconView = [[UIImageView alloc]initWithImage:greyIcon];
     [greyIconView setUserInteractionEnabled:YES];
-    UITapGestureRecognizer *appSelectionTap = [[UITapGestureRecognizer alloc] init];                    objc_setAssociatedObject(appSelectionTap, "iconItem", self, OBJC_ASSOCIATION_ASSIGN);
-    
+   
     [greyIconView setFrame:CGRectMake([self iconTemplatePosition].origin.x/2 + 2, [self iconTemplatePosition].origin.y/2 + 2, [self iconTemplatePosition].size.width/2, [self iconTemplatePosition].size.height/2)];
     
     UIImage *clearIcon= [[UIImage alloc] initWithCGImage:[UIImage imageNamed: @"mask_clear.png"].CGImage scale:DISPLAY_SCALE orientation:UIImageOrientationUp];
@@ -108,6 +107,7 @@ static NSMutableArray *items;
                         CGRect labelTemplatePosition = CGRectMake(labelX, labelY, LABEL_WIDTH, LABEL_HEIGHT);
                         
                         IconItem *item = [[IconItem alloc]initWithIconTemplatePosition:iconTemplatePosition andLabelTemplatePosition:labelTemplatePosition];
+                        
                         UIImage *greyIcon= [[UIImage alloc] initWithCGImage:[UIImage imageNamed: @"mask_grey.png"].CGImage scale:DISPLAY_SCALE orientation:UIImageOrientationUp];
                         UIImageView *greyIconView = [[UIImageView alloc]initWithImage:greyIcon];
                         [greyIconView setUserInteractionEnabled:YES];
@@ -123,7 +123,7 @@ static NSMutableArray *items;
                         
                         [clearIconView setFrame:CGRectMake([item iconTemplatePosition].origin.x/2 + 2, [item iconTemplatePosition].origin.y/2 + 2, [item iconTemplatePosition].size.width/2, [item iconTemplatePosition].size.height/2)];
                         
-                                                          
+                        
                         [item setGreyIconTemplateView: greyIconView];
                         [item setClearIconTemplateView: clearIconView];
                         [item setAppSelectionTap: appSelectionTap];

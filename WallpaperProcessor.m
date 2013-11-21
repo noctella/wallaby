@@ -89,14 +89,14 @@ static UIImage *mask;
     [WallpaperDatabase saveIconItems:[IconItem items]];
 }
 
-+ (UIImage *)process: (UIImage *)wallpaper{
+/*+ (UIImage *)process: (UIImage *)wallpaper{
     UIImage *processedWallpaperOrig = [[UIImage alloc] initWithCGImage:wallpaper.CGImage scale:DISPLAY_SCALE orientation:UIImageOrientationUp];
 
     UIImage *processedWallpaper = [self formatImage:processedWallpaperOrig];
     processedWallpaper = [self MergeImage:processedWallpaper withImage:template atXLoc:0 atYLoc:0];
     return processedWallpaper;
     
-}
+}*/
 
 
 
